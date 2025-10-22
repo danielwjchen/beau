@@ -8,12 +8,9 @@
 import AVFoundation
 import Foundation
 
-/// Scans a directory and its subdirectories for 4K video files.
-/// - Parameter folderURL: The URL of the folder to begin the search.
-/// - Returns: An array of URLs pointing to the 4K video files found.
-func find4KVideoFiles(in folderURL: URL) async -> [URL] {
+func getVideoFileURLs(in folderURL: URL) -> [URL] {
   let fileManager = FileManager.default
-  var foundVideoFiles: [URL] = []
+  var result: [URL] = []
 
   // Define a set of common video file extensions to filter by.
   let videoExtensions: Set<String> = [
@@ -24,34 +21,45 @@ func find4KVideoFiles(in folderURL: URL) async -> [URL] {
   guard
     let enumerator = fileManager.enumerator(
       at: folderURL,
-      includingPropertiesForKeys: [.isRegularFileKey],
-      options: [.skipsHiddenFiles, .skipsPackageDescendants])
+      includingPropertiesForKeys: nil,
+      options: [.skipsHiddenFiles])
+    //   includingPropertiesForKeys: [.isRegularFileKey],
+    //   options: [.skipsHiddenFiles, .skipsPackageDescendants])
   else {
     print("Could not create enumerator for folder: \(folderURL.path)")
-    return []
+    return result
   }
-
   for case let fileURL as URL in enumerator {
     do {
       // Check if the item is a regular file.
       let fileAttributes = try fileURL.resourceValues(forKeys: [.isRegularFileKey])
-      if fileAttributes.isRegularFile == true {
-
-        // Filter files by their extension.
-        if videoExtensions.contains(fileURL.pathExtension.lowercased()) {
-
-          // Check the video resolution.
-          if await is4KVideo(at: fileURL) {
-            foundVideoFiles.append(fileURL)
-          }
-        }
+      if fileAttributes.isRegularFile != true {
+        continue
+      }
+      if videoExtensions.contains(fileURL.pathExtension.lowercased()) {
+        result.append(fileURL)
       }
     } catch {
       print("Error accessing file \(fileURL.path): \(error)")
     }
   }
+  return result
+}
 
-  return foundVideoFiles
+/// Scans a directory and its subdirectories for 4K video files.
+/// - Parameter folderURL: The URL of the folder to begin the search.
+/// - Returns: An array of URLs pointing to the 4K video files found.
+func find4KVideoFiles(in videoFileURLs: [URL]) async -> [URL] {
+
+  var result: [URL] = []
+  for case let fileURL in videoFileURLs {
+    // Check the video resolution.
+    if await is4KVideo(at: fileURL) {
+      result.append(fileURL)
+    }
+  }
+
+  return result
 }
 
 /// Checks if a video file at a given URL has a 4K resolution (3840x2160 or higher).
@@ -66,9 +74,10 @@ func is4KVideo(at url: URL) async -> Bool {
     }
 
     let videoSize: CGSize = try await videoTrack.load(.naturalSize)
-    let result: Bool = videoSize.width >= 3840 && videoSize.height >= 2160
+    let result: Bool =
+      (videoSize.width >= 3840 && videoSize.height >= 2160)
+      || (videoSize.height >= 3840 && videoSize.width >= 2160)
     return result
-
   } catch {
     return false
   }

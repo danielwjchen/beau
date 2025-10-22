@@ -16,10 +16,16 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
 
+  @StateObject private var session: BeauSession = BeauSession(
+    resolution: "4k",
+    encoding: "HEVC",
+  )
+
   @State private var isImporterPresented = false
 
-  private func findVideos(at: URL) async -> [URL] {
-    let result = await find4KVideoFiles(in: at)
+  private func findVideos(at folderURL: URL) async -> [URL] {
+    let videoFileURLs = getVideoFileURLs(in: folderURL)
+    let result = await find4KVideoFiles(in: videoFileURLs)
     return result
   }
 
@@ -34,16 +40,11 @@ struct ContentView: View {
       switch result {
       case .success(let urls):
         if let sourceURL = urls.first {
-          var session: BeauSession = BeauSession(
-            resolution: "4k",
-            encoding: "HEVC",
-            sourceURL: sourceURL,
-            targetURL: sourceURL,
-            items: []
-          )
+          self.session.sourceURL = sourceURL
+          self.session.targetURL = sourceURL
           Task {
             for videoURL in await self.findVideos(at: sourceURL) {
-              session.items.append(
+              self.session.items.append(
                 BeauItem(
                   sourceURL: videoURL,
                   targetURL: videoURL,
@@ -56,6 +57,9 @@ struct ContentView: View {
       case .failure(let error):
         print("\(error.localizedDescription)")
       }
+    }
+    List(session.items, id: \.sourceURL) { item in
+      Text(item.sourceURL.absoluteString)
     }
   }
 }
