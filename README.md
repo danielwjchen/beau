@@ -1,6 +1,6 @@
-# 🎞️ BEAU — Bulk Encode Archival Utility
+# 🎞️ BEAU — Batch Encode Archival Utility
 
-**BEAU** (Bulk Encode Archival Utility) is a cross-platform video compression tool written in **Swift 6** for **macOS**, **iPadOS**, and **iOS**.  
+**BEAU** (Batch Encode Archival Utility) is a cross-platform video compression tool written in **Swift 6** for **macOS**, **iPadOS**, and **iOS**.  
 It automatically finds and encodes **4K video files** in a folder to reduce storage usage while maintaining high visual quality, making it ideal for creators, archivists, and anyone managing large video libraries.
 
 ---
