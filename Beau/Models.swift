@@ -23,6 +23,7 @@ class BeauSession: ObservableObject {
   var resolution: String
   var encoding: String
   var renamePattern: String
+  var tempFileNamePattern: String
   var preservesMeta: Bool
   var sourceURL: URL?
   var targetURL: URL?
@@ -49,6 +50,7 @@ class BeauSession: ObservableObject {
     self.resolution = resolution
     self.encoding = encoding
     self.renamePattern = renamePattern
+    self.tempFileNamePattern = tempFileNamePattern
     self.preservesMeta = preservesMeta
     self.sourceURL = sourceURL
     self.targetURL = targetURL

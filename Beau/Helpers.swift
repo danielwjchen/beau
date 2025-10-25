@@ -90,10 +90,10 @@ enum ExportProgress {
   case failed(Error)
 }
 
-/// Exports a video to 1080p resolution with HEVC encoding, reporting progress.
-/// - Parameter sourceURL: The URL of the video file to convert.
-/// - Returns: An AsyncStream that yields progress updates.
-func exportTo1080pHEVCWithProgress(from sourceURL: URL) -> AsyncThrowingStream<
+func encodeVideoWithProgress(
+  from sourceURL: URL, to targetURL: URL,
+  presetName: String = AVAssetExportPreset1920x1080
+) -> AsyncThrowingStream<
   ExportProgress, Error
 > {
   return AsyncThrowingStream { continuation in
@@ -102,7 +102,7 @@ func exportTo1080pHEVCWithProgress(from sourceURL: URL) -> AsyncThrowingStream<
     guard
       let exportSession = AVAssetExportSession(
         asset: asset,
-        presetName: AVAssetExportPresetHEVC1920x1080
+        presetName: presetName,
       )
     else {
       continuation.finish(
@@ -114,17 +114,12 @@ func exportTo1080pHEVCWithProgress(from sourceURL: URL) -> AsyncThrowingStream<
       return
     }
 
-    // Define the output file.
-    let outputURL = FileManager.default.temporaryDirectory
-      .appendingPathComponent(UUID().uuidString)
-      .appendingPathExtension("mov")
-
     exportSession.outputFileType = .mov
-    exportSession.outputURL = outputURL
+    exportSession.outputURL = targetURL
 
     // Remove old file if it exists to avoid conflicts.
-    if FileManager.default.fileExists(atPath: outputURL.path) {
-      try? FileManager.default.removeItem(at: outputURL)
+    if FileManager.default.fileExists(atPath: targetURL.path) {
+      try? FileManager.default.removeItem(at: targetURL)
     }
 
     continuation.yield(.started)
@@ -133,7 +128,7 @@ func exportTo1080pHEVCWithProgress(from sourceURL: URL) -> AsyncThrowingStream<
     exportSession.exportAsynchronously {
       switch exportSession.status {
       case .completed:
-        continuation.yield(.completed(outputURL))
+        continuation.yield(.completed(targetURL))
         continuation.finish()
       case .failed:
         if let error = exportSession.error {
@@ -167,4 +162,28 @@ func exportTo1080pHEVCWithProgress(from sourceURL: URL) -> AsyncThrowingStream<
       exportSession.cancelExport()
     }
   }
+}
+
+enum TempFileError: Error {
+  case DirectoryNotFound
+  case FileExists
+}
+
+func getTempFileURL(
+  from sourceURL: URL, pattern tempFileNamePattern: String, as targetFileExtension: String = ".mp4"
+) throws -> URL {
+  let folderURL = sourceURL.deletingLastPathComponent()
+  var isDirectory: ObjCBool = false
+  if FileManager.default.fileExists(atPath: folderURL.path, isDirectory: &isDirectory),
+    !isDirectory.boolValue
+  {
+    throw TempFileError.DirectoryNotFound
+  }
+  let originalFileName = sourceURL.deletingPathExtension().lastPathComponent
+  let tempFileName = originalFileName + tempFileNamePattern + targetFileExtension
+  let result = folderURL.appendingPathComponent(tempFileName)
+  if FileManager.default.fileExists(atPath: result.path) {
+    throw TempFileError.FileExists
+  }
+  return result
 }
