@@ -14,6 +14,7 @@ struct BeauItem {
   var timeEnd: Date?
   var resolution: String
   var encoding: String
+  var error: String = ""
   var completionPercentage: Float?
 }
 

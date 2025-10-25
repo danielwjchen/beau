@@ -21,7 +21,8 @@ struct ContentView: View {
     encoding: "HEVC",
   )
 
-  @State private var isImporterPresented = false
+  @State private var isImporterPresented: Bool = false
+  @State private var isReady: Bool = false
 
   private func findVideos(at folderURL: URL) async -> [URL] {
     let videoFileURLs = getVideoFileURLs(in: folderURL)
@@ -31,6 +32,7 @@ struct ContentView: View {
 
   var body: some View {
     Button("Select Folder") {
+      isReady = false
       isImporterPresented = true
     }.fileImporter(
       isPresented: $isImporterPresented,
@@ -52,6 +54,7 @@ struct ContentView: View {
                   encoding: session.encoding
                 ))
             }
+            isReady = true
           }
         }
       case .failure(let error):
@@ -61,6 +64,10 @@ struct ContentView: View {
     List(session.items, id: \.sourceURL) { item in
       Text(item.sourceURL.absoluteString)
     }
+    Button("Start") {
+
+    }
+    .disabled(!isReady)
   }
 }
 
