@@ -42,11 +42,11 @@ struct ContentView: View {
       switch result {
       case .success(let urls):
         if let sourceURL = urls.first {
-          self.session.sourceURL = sourceURL
-          self.session.targetURL = sourceURL
+          session.sourceURL = sourceURL
+          session.targetURL = sourceURL
           Task {
-            for videoURL in await self.findVideos(at: sourceURL) {
-              self.session.items.append(
+            for videoURL in await findVideos(at: sourceURL) {
+              session.items.append(
                 BeauItem(
                   sourceURL: videoURL,
                   targetURL: videoURL,

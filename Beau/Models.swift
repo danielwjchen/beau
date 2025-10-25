@@ -36,6 +36,7 @@ class BeauSession: ObservableObject {
     resolution: String,
     encoding: String,
     renamePattern: String = "",
+    tempFileNamePattern: String = ".tmp",
     preservesMeta: Bool = true,
     sourceURL: URL? = nil,
     targetURL: URL? = nil,
