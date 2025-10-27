@@ -8,6 +8,14 @@
 import AVFoundation
 import Foundation
 
+enum TempFileError: Error {
+  case DirectoryNotFound
+  case FileExists
+  case UnableToEncode
+  case unknownExportError
+  case cancelled
+}
+
 func getVideoFileURLs(in folderURL: URL) -> [URL] {
   let fileManager = FileManager.default
   var result: [URL] = []
@@ -92,81 +100,57 @@ enum ExportProgress {
 
 func encodeVideoWithProgress(
   from sourceURL: URL, to targetURL: URL,
-  presetName: String = AVAssetExportPreset1920x1080
-) -> AsyncThrowingStream<
-  ExportProgress, Error
-> {
-  return AsyncThrowingStream { continuation in
-    let asset = AVAsset(url: sourceURL)
+  presetName: String = AVAssetExportPreset1920x1080,
+  progressHandler: @escaping (Float) -> Void
+) async throws {
+  let asset = AVAsset(url: sourceURL)
 
-    guard
-      let exportSession = AVAssetExportSession(
-        asset: asset,
-        presetName: presetName,
-      )
-    else {
-      continuation.finish(
-        throwing: NSError(
-          domain: "VideoConverter", code: 1,
-          userInfo: [
-            NSLocalizedDescriptionKey: "Failed to create export session."
-          ]))
-      return
-    }
+  guard
+    let exportSession = AVAssetExportSession(
+      asset: asset,
+      presetName: presetName,
+    )
+  else {
+    throw TempFileError.UnableToEncode
+  }
 
-    exportSession.outputFileType = .mov
-    exportSession.outputURL = targetURL
+  exportSession.outputFileType = .mp4
+  exportSession.outputURL = targetURL
 
-    // Remove old file if it exists to avoid conflicts.
-    if FileManager.default.fileExists(atPath: targetURL.path) {
-      try? FileManager.default.removeItem(at: targetURL)
-    }
+  // Remove old file if it exists to avoid conflicts.
+  if FileManager.default.fileExists(atPath: targetURL.path) {
+    throw TempFileError.FileExists
+  }
 
-    continuation.yield(.started)
-
-    // Start the export in a background task.
-    exportSession.exportAsynchronously {
-      switch exportSession.status {
-      case .completed:
-        continuation.yield(.completed(targetURL))
-        continuation.finish()
-      case .failed:
-        if let error = exportSession.error {
-          continuation.yield(.failed(error))
-        }
-        continuation.finish()
-      case .cancelled:
-        continuation.finish(
-          throwing: NSError(
-            domain: "VideoConverter", code: 3,
-            userInfo: [
-              NSLocalizedDescriptionKey: "Video export was cancelled."
-            ]))
-      default:
-        break  // Wait for completion, failure, or cancellation.
-      }
-    }
-
-    // Use a repeating timer to poll for progress updates.
-    let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-      guard exportSession.status == .exporting else { return }
-      let progress = exportSession.progress
-      if progress > 0.0 {
-        continuation.yield(.progress(progress))
-      }
-    }
-
-    // Handle cancellation of the `AsyncStream`.
-    continuation.onTermination = { @Sendable _ in
-      timer.invalidate()
-      exportSession.cancelExport()
+  progressHandler(0.0)
+  // Use a Task for progress reporting.
+  let progressTask = Task {
+    while exportSession.progress < 1.0 {
+      progressHandler(exportSession.progress)
+      try await Task.sleep(for: .milliseconds(500))  // Report every half-second.
     }
   }
-}
 
-enum TempFileError: Error {
-  case DirectoryNotFound
-  case FileExists
+  // Start the export operation.
+  await exportSession.export()
+
+  // End the progress monitoring task.
+  progressTask.cancel()
+
+  // Handle completion or failure.
+  switch exportSession.status {
+  case .completed:
+    progressHandler(1.0)  // Report 100% completion.
+  case .failed:
+    if let error = exportSession.error {
+      throw error
+    }
+    throw TempFileError.unknownExportError
+  case .cancelled:
+    throw TempFileError.cancelled
+  default:
+    break
+  }
 }
 
 func getTempFileURL(

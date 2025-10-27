@@ -67,6 +67,7 @@ struct ContentView: View {
     }
     Button("Start") {
       session.timeBegin = Date()
+      isReady = false
       for i in session.items.indices {
         do {
           let tempFileUrl = try getTempFileURL(
