@@ -63,8 +63,28 @@ struct ContentView: View {
     }
     List(session.items, id: \.sourceURL) { item in
       Text(item.sourceURL.absoluteString)
+      ProgressView(value: item.completionPercentage)
     }
     Button("Start") {
+      session.timeBegin = Date()
+      for i in session.items.indices {
+        do {
+          let tempFileUrl = try getTempFileURL(
+            from: session.items[i].sourceURL, pattern: session.tempFileNamePattern
+          )
+          session.items[i].timeBegin = Date()
+          Task {
+            try await encodeVideoWithProgress(
+              from: session.items[i].sourceURL, to: tempFileUrl
+            ) { progress in
+              session.items[i].completionPercentage = progress
+            }
+            session.items[i].timeEnd = Date()
+          }
+        } catch {
+          session.items[i].error = error.localizedDescription
+        }
+      }
 
     }
     .disabled(!isReady)
