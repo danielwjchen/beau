@@ -62,14 +62,14 @@ struct ContentView: View {
       }
     }
     List(session.items, id: \.sourceURL) { item in
-      Text(item.sourceURL.absoluteString)
-      ProgressView(value: item.completionPercentage)
+      BeauItemView(item: item)
     }
     Button("Start") {
       session.timeBegin = Date()
       isReady = false
       for i in session.items.indices {
         do {
+          session.items[i].completionPercentage = 0
           let tempFileUrl = try getTempFileURL(
             from: session.items[i].sourceURL, pattern: session.tempFileNamePattern
           )

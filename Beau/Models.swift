@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct BeauItem {
+class BeauItem: ObservableObject {
   var sourceURL: URL
   var targetURL: URL
   var rename: String = ""
@@ -14,8 +14,19 @@ struct BeauItem {
   var timeEnd: Date?
   var resolution: String
   var encoding: String
-  var error: String = ""
-  var completionPercentage: Float?
+  @Published var error: String = ""
+  @Published var completionPercentage: Float = 0.0
+  init(
+    sourceURL: URL,
+    targetURL: URL,
+    resolution: String,
+    encoding: String
+  ) {
+    self.sourceURL = sourceURL
+    self.targetURL = targetURL
+    self.resolution = resolution
+    self.encoding = encoding
+  }
 }
 
 class BeauSession: ObservableObject {
@@ -28,7 +39,7 @@ class BeauSession: ObservableObject {
   var sourceURL: URL?
   var targetURL: URL?
   var preservesFolders: Bool
-  var items: [BeauItem]
+  @Published var items: [BeauItem] = []
   var timeBegin: Date?
   var timeEnd: Date?
 

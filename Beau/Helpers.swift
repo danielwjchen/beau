@@ -91,13 +91,6 @@ func is4KVideo(at url: URL) async -> Bool {
   }
 }
 
-enum ExportProgress {
-  case started
-  case progress(Float)
-  case completed(URL)
-  case failed(Error)
-}
-
 func encodeVideoWithProgress(
   from sourceURL: URL, to targetURL: URL,
   presetName: String = AVAssetExportPreset1920x1080,
