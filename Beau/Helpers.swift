@@ -14,6 +14,7 @@ enum TempFileError: Error {
   case UnableToEncode
   case unknownExportError
   case cancelled
+  case UnableToLoadVideoTrack
 }
 
 func getVideoFileURLs(in folderURL: URL) -> [URL] {
@@ -57,38 +58,49 @@ func getVideoFileURLs(in folderURL: URL) -> [URL] {
 /// Scans a directory and its subdirectories for 4K video files.
 /// - Parameter folderURL: The URL of the folder to begin the search.
 /// - Returns: An array of URLs pointing to the 4K video files found.
-func find4KVideoFiles(in videoFileURLs: [URL]) async -> [URL] {
+func createBeauItems(
+  _ videoFileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String
+) async -> [BeauItem] {
 
-  var result: [URL] = []
-  for case let fileURL in videoFileURLs {
-    // Check the video resolution.
-    if await is4KVideo(at: fileURL) {
-      result.append(fileURL)
+  var result: [BeauItem] = []
+  for case let videoFileURL in videoFileURLs {
+    let item = BeauItem(
+      sourceURL: videoFileURL,
+      targetURL: videoFileURL,
+      targetResolution: targetResolution,
+      targetEncoding: targetEncoding
+    )
+    do {
+      let asset: AVAsset = AVAsset(url: videoFileURL)
+      guard let videoTrack: AVAssetTrack = try await asset.loadTracks(withMediaType: .video).first
+      else {
+        throw TempFileError.UnableToLoadVideoTrack
+      }
+      item.sourceResolution = try await videoTrack.load(.naturalSize)
+    } catch {
+      item.error = error.localizedDescription
     }
+    // Check the video resolution.
+    result.append(item)
   }
 
   return result
 }
 
-/// Checks if a video file at a given URL has a 4K resolution (3840x2160 or higher).
-/// - Parameter url: The URL of the video file.
-/// - Returns: `true` if the video is 4K, otherwise `false`.
-func is4KVideo(at url: URL) async -> Bool {
-  let asset: AVAsset = AVAsset(url: url)
-  do {
-    guard let videoTrack: AVAssetTrack = try await asset.loadTracks(withMediaType: .video).first
-    else {
-      return false
-    }
+func is1080pVideo(videoSize: CGSize) -> Bool {
+  let result: Bool =
+    (videoSize.width >= 1920 && videoSize.height >= 1080)
+    || (videoSize.height >= 1920 && videoSize.width >= 1080)
 
-    let videoSize: CGSize = try await videoTrack.load(.naturalSize)
-    let result: Bool =
-      (videoSize.width >= 3840 && videoSize.height >= 2160)
-      || (videoSize.height >= 3840 && videoSize.width >= 2160)
-    return result
-  } catch {
-    return false
-  }
+  return result
+}
+
+func is4KVideo(videoSize: CGSize) -> Bool {
+  let result: Bool =
+    (videoSize.width >= 3840 && videoSize.height >= 2160)
+    || (videoSize.height >= 3840 && videoSize.width >= 2160)
+
+  return result
 }
 
 func encodeVideoWithProgress(

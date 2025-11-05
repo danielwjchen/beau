@@ -12,20 +12,22 @@ class BeauItem: ObservableObject {
   var rename: String = ""
   var timeBegin: Date?
   var timeEnd: Date?
-  var resolution: String
-  var encoding: String
+  var sourceResolution: CGSize?
+  var targetResolution: CGSize
+  var sourceEncoding: String = ""
+  var targetEncoding: String
   @Published var error: String = ""
   @Published var completionPercentage: Float = 0.0
   init(
     sourceURL: URL,
     targetURL: URL,
-    resolution: String,
-    encoding: String
+    targetResolution: CGSize,
+    targetEncoding: String
   ) {
     self.sourceURL = sourceURL
     self.targetURL = targetURL
-    self.resolution = resolution
-    self.encoding = encoding
+    self.targetResolution = targetResolution
+    self.targetEncoding = targetEncoding
   }
 }
 

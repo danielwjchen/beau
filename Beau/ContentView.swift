@@ -24,12 +24,6 @@ struct ContentView: View {
   @State private var isImporterPresented: Bool = false
   @State private var isReady: Bool = false
 
-  private func findVideos(at folderURL: URL) async -> [URL] {
-    let videoFileURLs = getVideoFileURLs(in: folderURL)
-    let result = await find4KVideoFiles(in: videoFileURLs)
-    return result
-  }
-
   var body: some View {
     Button("Select Folder") {
       isReady = false
@@ -44,16 +38,11 @@ struct ContentView: View {
         if let sourceURL = urls.first {
           session.sourceURL = sourceURL
           session.targetURL = sourceURL
+          let videoFileURLs = getVideoFileURLs(in: sourceURL)
+          let targetResolution = CGSize(width: 1920, height: 1080)
+          let targetEncoding = ""
           Task {
-            for videoURL in await findVideos(at: sourceURL) {
-              session.items.append(
-                BeauItem(
-                  sourceURL: videoURL,
-                  targetURL: videoURL,
-                  resolution: session.resolution,
-                  encoding: session.encoding
-                ))
-            }
+            session.items = await createBeauItems(videoFileURLs, targetResolution, targetEncoding)
             isReady = true
           }
         }
