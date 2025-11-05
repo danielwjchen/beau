@@ -5,12 +5,35 @@ struct BeauItemView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Text(item.sourceURL.lastPathComponent)
+      HStack(alignment: .center) {
+        BeauNameAndSizeView(
+          name: item.sourceURL.lastPathComponent,
+          size: item.sourceResolution
+        )
+        Spacer()
+        BeauNameAndSizeView(
+          name: item.targetURL.lastPathComponent,
+          size: item.targetResolution
+        )
+      }
       ProgressView(value: item.completionPercentage)
+        .opacity(item.completionPercentage == nil ? 0 : 1)
       if !item.error.isEmpty {
         Text(item.error)
           .foregroundColor(.red)
       }
     }
   }
+}
+
+#Preview {
+  let item = BeauItem(
+    sourceURL: URL(string: "files://location/sample.mov")!,
+    targetURL: URL(string: "files://location/sample.mp4")!,
+    targetResolution: CGSize(width: 1920, height: 1080),
+    targetEncoding: "avc",
+    sourceResolution: CGSize(width: 3840, height: 2160),
+    sourceEncoding: "hevc"
+  )
+  BeauItemView(item: item)
 }

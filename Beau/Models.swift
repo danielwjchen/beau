@@ -17,7 +17,7 @@ class BeauItem: ObservableObject {
   var sourceEncoding: String = ""
   var targetEncoding: String
   @Published var error: String = ""
-  @Published var completionPercentage: Float = 0.0
+  @Published var completionPercentage: Float? = nil
   init(
     sourceURL: URL,
     targetURL: URL,
@@ -28,6 +28,21 @@ class BeauItem: ObservableObject {
     self.targetURL = targetURL
     self.targetResolution = targetResolution
     self.targetEncoding = targetEncoding
+  }
+  init(
+    sourceURL: URL,
+    targetURL: URL,
+    targetResolution: CGSize,
+    targetEncoding: String,
+    sourceResolution: CGSize,
+    sourceEncoding: String
+  ) {
+    self.sourceURL = sourceURL
+    self.targetURL = targetURL
+    self.targetResolution = targetResolution
+    self.targetEncoding = targetEncoding
+    self.sourceResolution = sourceResolution
+    self.sourceEncoding = sourceEncoding
   }
 }
 

@@ -59,14 +59,16 @@ func getVideoFileURLs(in folderURL: URL) -> [URL] {
 /// - Parameter folderURL: The URL of the folder to begin the search.
 /// - Returns: An array of URLs pointing to the 4K video files found.
 func createBeauItems(
-  _ videoFileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String
+  _ videoFileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
+  _ targetFileExtension: String = "mp4"
 ) async -> [BeauItem] {
 
   var result: [BeauItem] = []
   for case let videoFileURL in videoFileURLs {
+    let targetURL = videoFileURL.deletingPathExtension().appendingPathExtension(targetFileExtension)
     let item = BeauItem(
       sourceURL: videoFileURL,
-      targetURL: videoFileURL,
+      targetURL: targetURL,
       targetResolution: targetResolution,
       targetEncoding: targetEncoding
     )
