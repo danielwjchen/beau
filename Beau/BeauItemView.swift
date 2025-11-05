@@ -8,12 +8,14 @@ struct BeauItemView: View {
       HStack(alignment: .center) {
         BeauNameAndSizeView(
           name: item.sourceURL.lastPathComponent,
-          size: item.sourceResolution
+          resolution: item.sourceResolution,
+          fileSize: item.sourceSize
         )
         Spacer()
         BeauNameAndSizeView(
           name: item.targetURL.lastPathComponent,
-          size: item.targetResolution
+          resolution: item.targetResolution,
+          fileSize: item.targetSize
         )
       }
       ProgressView(value: item.completionPercentage)
@@ -33,7 +35,8 @@ struct BeauItemView: View {
     targetResolution: CGSize(width: 1920, height: 1080),
     targetEncoding: "avc",
     sourceResolution: CGSize(width: 3840, height: 2160),
-    sourceEncoding: "hevc"
+    sourceEncoding: "hevc",
+    sourceFileSize: 123456
   )
   BeauItemView(item: item)
 }

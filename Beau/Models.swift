@@ -16,6 +16,8 @@ class BeauItem: ObservableObject {
   var targetResolution: CGSize
   var sourceEncoding: String = ""
   var targetEncoding: String
+  var sourceSize: Int64? = nil
+  var targetSize: Int64? = nil
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
   init(
@@ -35,7 +37,8 @@ class BeauItem: ObservableObject {
     targetResolution: CGSize,
     targetEncoding: String,
     sourceResolution: CGSize,
-    sourceEncoding: String
+    sourceEncoding: String,
+    sourceFileSize: Int64?
   ) {
     self.sourceURL = sourceURL
     self.targetURL = targetURL
@@ -43,6 +46,7 @@ class BeauItem: ObservableObject {
     self.targetEncoding = targetEncoding
     self.sourceResolution = sourceResolution
     self.sourceEncoding = sourceEncoding
+    self.sourceSize = sourceFileSize
   }
 }
 

@@ -55,6 +55,11 @@ func getVideoFileURLs(in folderURL: URL) -> [URL] {
   return result
 }
 
+func getFileSize(at url: URL) throws -> Int64? {
+  let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+  return attributes[.size] as? Int64
+}
+
 /// Scans a directory and its subdirectories for 4K video files.
 /// - Parameter folderURL: The URL of the folder to begin the search.
 /// - Returns: An array of URLs pointing to the 4K video files found.
@@ -79,6 +84,7 @@ func createBeauItems(
         throw TempFileError.UnableToLoadVideoTrack
       }
       item.sourceResolution = try await videoTrack.load(.naturalSize)
+      item.sourceSize = try getFileSize(at: videoFileURL)
     } catch {
       item.error = error.localizedDescription
     }
