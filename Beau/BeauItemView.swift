@@ -11,7 +11,9 @@ struct BeauItemView: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack(alignment: .center) {
-        self.thumbnail
+        HStack(alignment: .center, spacing: 2) {
+          self.thumbnail
+        }.frame(width: 200)
         BeauNameAndSizeView(
           name: item.sourceURL.lastPathComponent,
           resolution: item.sourceResolution,
