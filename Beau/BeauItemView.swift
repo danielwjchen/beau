@@ -41,7 +41,7 @@ struct BeauItemView: View {
           self.thumbnail = Image(nsImage: nsImage)
         #else
           let uiImage = UIImage(cgImage: cgImage)
-          self.thumbnail = Image(uiImage)
+          self.thumbnail = Image(uiImage: uiImage)
         #endif
       } catch {
         item.error = "Thumbnail error: \(error.localizedDescription)"
