@@ -263,3 +263,21 @@ func generateThumbnail(
     }
   }
 }
+
+func moveFileToTrashIfExists(at url: URL) throws -> Bool {
+  let fileManager = FileManager.default
+
+  // Make sure the file exists first
+  guard fileManager.fileExists(atPath: url.path) else {
+    return false
+  }
+
+  #if os(macOS)
+    var resultingURL: NSURL?
+    try fileManager.trashItem(at: url, resultingItemURL: &resultingURL)
+    return true
+  #else
+    try fileManager.removeItem(at: url)
+    return true
+  #endif
+}
