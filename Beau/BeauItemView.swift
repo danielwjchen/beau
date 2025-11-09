@@ -2,10 +2,16 @@ import SwiftUI
 
 struct BeauItemView: View {
   @ObservedObject var item: BeauItem
+  @State private var thumbnail = Image(systemName: "video")
+
+  init(item: BeauItem) {
+    self.item = item
+  }
 
   var body: some View {
     VStack(alignment: .leading) {
       HStack(alignment: .center) {
+        self.thumbnail
         BeauNameAndSizeView(
           name: item.sourceURL.lastPathComponent,
           resolution: item.sourceResolution,
@@ -23,6 +29,20 @@ struct BeauItemView: View {
       if !item.error.isEmpty {
         Text(item.error)
           .foregroundColor(.red)
+      }
+    }
+    .task {
+      do {
+        let cgImage = try await generateThumbnail(for: item.sourceURL)
+        #if os(macOS)
+          let nsImage = NSImage(cgImage: cgImage, size: .zero)
+          self.thumbnail = Image(nsImage: nsImage)
+        #else
+          let uiImage = UIImage(cgImage: cgImage)
+          self.thumbnail = Image(uiImage)
+        #endif
+      } catch {
+        item.error = "Thumbnail error: \(error.localizedDescription)"
       }
     }
   }

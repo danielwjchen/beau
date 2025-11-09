@@ -6,7 +6,14 @@
 //
 
 import AVFoundation
+import CoreGraphics
 import Foundation
+
+#if os(macOS)
+  import AppKit
+#else
+  import UIKit  // use AppKit instead if macOS
+#endif
 
 enum TempFileError: Error {
   case DirectoryNotFound
@@ -183,4 +190,76 @@ func getTempFileURL(
     throw TempFileError.FileExists
   }
   return result
+}
+
+func resizeCGImage(_ image: CGImage, to size: CGSize) -> CGImage? {
+  guard let colorSpace = image.colorSpace else { return nil }
+  guard
+    let context = CGContext(
+      data: nil,
+      width: Int(size.width),
+      height: Int(size.height),
+      bitsPerComponent: image.bitsPerComponent,
+      bytesPerRow: 0,
+      space: colorSpace,
+      bitmapInfo: image.bitmapInfo.rawValue
+    )
+  else {
+    return nil
+  }
+
+  context.interpolationQuality = .high
+  context.draw(image, in: CGRect(origin: .zero, size: size))
+  return context.makeImage()
+}
+
+func generateThumbnail(
+  for videoURL: URL,
+  targetHeight: CGFloat = 100,
+  at time: CMTime = CMTime(seconds: 1, preferredTimescale: 60)
+)
+  async throws -> CGImage
+{
+  return try await withCheckedThrowingContinuation { continuation in
+    let asset = AVAsset(url: videoURL)
+    let imageGenerator = AVAssetImageGenerator(asset: asset)
+    imageGenerator.appliesPreferredTrackTransform = true
+    imageGenerator.requestedTimeToleranceAfter = .zero
+    imageGenerator.requestedTimeToleranceBefore = .zero
+
+    // Get the first frame at time = 1 second (you can adjust this)
+    let time = CMTime(seconds: 1.0, preferredTimescale: 600)
+
+    // Generate asynchronously
+    imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) {
+      _, cgImage, _, result, error in
+      if let error = error {
+        continuation.resume(throwing: error)
+        return
+      }
+
+      guard let cgImage = cgImage else {
+        continuation.resume(
+          throwing: NSError(
+            domain: "ThumbnailError", code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "Failed to generate thumbnail"]))
+        return
+      }
+
+      // Scale the image to target height
+      let originalWidth = CGFloat(cgImage.width)
+      let originalHeight = CGFloat(cgImage.height)
+      let scale = targetHeight / originalHeight
+      let newSize = CGSize(width: originalWidth * scale, height: targetHeight)
+
+      if let resized = resizeCGImage(cgImage, to: newSize) {
+        continuation.resume(returning: resized)
+      } else {
+        continuation.resume(
+          throwing: NSError(
+            domain: "ThumbnailResizeError", code: -2,
+            userInfo: [NSLocalizedDescriptionKey: "Failed to resize thumbnail"]))
+      }
+    }
+  }
 }
