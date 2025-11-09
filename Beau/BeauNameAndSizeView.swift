@@ -12,27 +12,41 @@ func getFileSizeString(fileSize: Int64?) -> String {
 
 struct BeauNameAndSizeView: View {
   let name: String
-  let resolution: CGSize?
-  let fileSize: Int64?
+  let resolutionString: String
+  let fileSizeString: String
 
-  var body: some View {
-    let resolutionString = String(
+  init(
+    name: String,
+    resolution: CGSize?,
+    fileSize: Int64?
+  ) {
+    self.name = name
+    self.resolutionString = String(
       format: "%dx%d",
       Int(resolution?.width ?? 0),
       Int(resolution?.height ?? 0)
     )
-    let fileSizeString = getFileSizeString(fileSize: fileSize)
+    self.fileSizeString = getFileSizeString(fileSize: fileSize)
+  }
+
+  var body: some View {
     VStack(alignment: .leading) {
       Text(name)
         .font(.headline)
+        .multilineTextAlignment(.leading)
       Text(resolutionString)
         .font(.subheadline)
         .fontWeight(.light)
+        .multilineTextAlignment(.leading)
       Text(fileSizeString)
         .font(.subheadline)
         .fontWeight(.light)
-
+        .multilineTextAlignment(.leading)
     }
+    .frame(
+      minWidth: 100,
+      maxWidth: 200
+    )
   }
 }
 
