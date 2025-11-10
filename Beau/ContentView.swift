@@ -57,22 +57,8 @@ struct ContentView: View {
       session.timeBegin = Date()
       isReady = false
       for i in session.items.indices {
-        do {
-          session.items[i].completionPercentage = 0
-          let tempFileUrl = try getTempFileURL(
-            from: session.items[i].sourceURL, pattern: session.tempFileNamePattern
-          )
-          session.items[i].timeBegin = Date()
-          Task {
-            try await encodeVideoWithProgress(
-              from: session.items[i].sourceURL, to: tempFileUrl
-            ) { progress in
-              session.items[i].completionPercentage = progress
-            }
-            session.items[i].timeEnd = Date()
-          }
-        } catch {
-          session.items[i].error = error.localizedDescription
+        Task {
+          await processBeauItem(session.items[i], session.tempFileNamePattern)
         }
       }
 

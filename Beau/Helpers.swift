@@ -264,7 +264,7 @@ func generateThumbnail(
   }
 }
 
-func moveFileToTrashIfExists(at url: URL) throws -> Bool {
+func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
   let fileManager = FileManager.default
 
   // Make sure the file exists first
@@ -280,4 +280,35 @@ func moveFileToTrashIfExists(at url: URL) throws -> Bool {
     try fileManager.removeItem(at: url)
     return true
   #endif
+}
+
+func processBeauItem(_ item: BeauItem, _ tempFileNamePattern: String) async {
+  do {
+    item.completionPercentage = 0
+    let tempFileURL = try getTempFileURL(
+      from: item.sourceURL, pattern: tempFileNamePattern
+    )
+    item.timeBegin = Date()
+    try await encodeVideoWithProgress(
+      from: item.sourceURL, to: tempFileURL
+    ) { progress in
+      item.completionPercentage = progress
+    }
+    item.targetSize = try getFileSize(at: tempFileURL)
+    if item.targetURL != item.sourceURL {
+      let isAbleToMoveFileToTrash = try moveFileToTrashIfExists(
+        item.sourceURL
+      )
+      if !isAbleToMoveFileToTrash {
+        item.error = "Unable to remove source file"
+      }
+    }
+    try FileManager.default.moveItem(
+      at: tempFileURL,
+      to: item.targetURL
+    )
+    item.timeEnd = Date()
+  } catch {
+    item.error = error.localizedDescription
+  }
 }
