@@ -15,13 +15,14 @@ import Foundation
   import UIKit  // use AppKit instead if macOS
 #endif
 
-enum TempFileError: Error {
-  case DirectoryNotFound
-  case FileExists
-  case UnableToEncode
-  case unknownExportError
-  case cancelled
-  case UnableToLoadVideoTrack
+enum BeauError: Error {
+  case DirectoryNotFound(String = "Directory not found")
+  case FileExists(String = "File already exists")
+  case UnableToEncode(String = "Unable to encode video")
+  case UnknownExportError(String = "Unknown export error")
+  case Cancelled(String = "Export cancelled")
+  case UnableToLoadVideoTrack(String = "Unable to load video track")
+  case UnableToRemoveSourceFile(String = "Unable to remove source file")
 }
 
 func getVideoFileURLs(in folderURL: URL) -> [URL] {
@@ -88,7 +89,7 @@ func createBeauItems(
       let asset: AVAsset = AVAsset(url: videoFileURL)
       guard let videoTrack: AVAssetTrack = try await asset.loadTracks(withMediaType: .video).first
       else {
-        throw TempFileError.UnableToLoadVideoTrack
+        throw BeauError.UnableToLoadVideoTrack()
       }
       item.sourceResolution = try await videoTrack.load(.naturalSize)
       item.sourceSize = try getFileSize(at: videoFileURL)
@@ -131,7 +132,7 @@ func encodeVideoWithProgress(
       presetName: presetName,
     )
   else {
-    throw TempFileError.UnableToEncode
+    throw BeauError.UnableToEncode()
   }
 
   exportSession.outputFileType = .mp4
@@ -139,7 +140,7 @@ func encodeVideoWithProgress(
 
   // Remove old file if it exists to avoid conflicts.
   if FileManager.default.fileExists(atPath: targetURL.path) {
-    throw TempFileError.FileExists
+    throw BeauError.FileExists()
   }
 
   progressHandler(0.0)
@@ -165,9 +166,9 @@ func encodeVideoWithProgress(
     if let error = exportSession.error {
       throw error
     }
-    throw TempFileError.unknownExportError
+    throw BeauError.UnknownExportError()
   case .cancelled:
-    throw TempFileError.cancelled
+    throw BeauError.Cancelled()
   default:
     break
   }
@@ -181,13 +182,13 @@ func getTempFileURL(
   if FileManager.default.fileExists(atPath: folderURL.path, isDirectory: &isDirectory),
     !isDirectory.boolValue
   {
-    throw TempFileError.DirectoryNotFound
+    throw BeauError.DirectoryNotFound()
   }
   let originalFileName = sourceURL.deletingPathExtension().lastPathComponent
   let tempFileName = originalFileName + tempFileNamePattern + targetFileExtension
   let result = folderURL.appendingPathComponent(tempFileName)
   if FileManager.default.fileExists(atPath: result.path) {
-    throw TempFileError.FileExists
+    throw BeauError.FileExists()
   }
   return result
 }
@@ -295,20 +296,20 @@ func processBeauItem(_ item: BeauItem, _ tempFileNamePattern: String) async {
       item.completionPercentage = progress
     }
     item.targetSize = try getFileSize(at: tempFileURL)
-    if item.targetURL != item.sourceURL {
-      let isAbleToMoveFileToTrash = try moveFileToTrashIfExists(
+    if item.targetURL.path == item.sourceURL.path {
+      let isAbleToMoveSourceFileToTrash = try moveFileToTrashIfExists(
         item.sourceURL
       )
-      if !isAbleToMoveFileToTrash {
-        item.error = "Unable to remove source file"
+      if !isAbleToMoveSourceFileToTrash {
+        throw BeauError.UnableToRemoveSourceFile()
       }
     }
     try FileManager.default.moveItem(
       at: tempFileURL,
       to: item.targetURL
     )
-    item.timeEnd = Date()
   } catch {
     item.error = error.localizedDescription
   }
+  item.timeEnd = Date()
 }
