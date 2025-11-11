@@ -10,14 +10,14 @@ class BeauItem: ObservableObject {
   var sourceURL: URL
   var targetURL: URL
   var rename: String = ""
-  var timeBegin: Date?
-  var timeEnd: Date?
+  @Published var timeBegin: Date?
+  @Published var timeEnd: Date?
   var sourceResolution: CGSize?
   var targetResolution: CGSize
   var sourceEncoding: String = ""
   var targetEncoding: String
   var sourceSize: Int64? = nil
-  var targetSize: Int64? = nil
+  @Published var targetSize: Int64? = nil
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
   init(
