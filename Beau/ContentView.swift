@@ -25,47 +25,55 @@ struct ContentView: View {
   @State private var isReady: Bool = false
 
   var body: some View {
-    Button("Select Folder") {
-      isReady = false
-      isImporterPresented = true
-    }.fileImporter(
-      isPresented: $isImporterPresented,
-      allowedContentTypes: allowedContentTypes,
-      allowsMultipleSelection: false
-    ) { result in
-      switch result {
-      case .success(let urls):
-        if let sourceURL = urls.first {
-          session.sourceURL = sourceURL
-          session.targetURL = sourceURL
-          let videoFileURLs = getVideoFileURLs(in: sourceURL)
-          let targetResolution = CGSize(width: 1920, height: 1080)
-          let targetEncoding = ""
-          Task {
-            session.items = await createBeauItems(videoFileURLs, targetResolution, targetEncoding)
-            isReady = true
-          }
-        }
-      case .failure(let error):
-        print("\(error.localizedDescription)")
-      }
-    }
     List(session.items, id: \.sourceURL) { item in
       BeauItemView(item: item)
     }
-    Button("Start") {
-      session.timeBegin = Date()
-      isReady = false
-      for i in session.items.indices {
-        Task {
-          await processBeauItem(session.items[i], session.tempFileNamePattern)
+    .toolbar {
+      ToolbarItemGroup(placement: .primaryAction) {
+        Button("Select Folder", systemImage: "folder") {
+          isReady = false
+          isImporterPresented = true
         }
+        .labelStyle(.titleAndIcon)
+        .fileImporter(
+          isPresented: $isImporterPresented,
+          allowedContentTypes: allowedContentTypes,
+          allowsMultipleSelection: false
+        ) { result in
+          switch result {
+          case .success(let urls):
+            if let sourceURL = urls.first {
+              session.sourceURL = sourceURL
+              session.targetURL = sourceURL
+              let videoFileURLs = getVideoFileURLs(in: sourceURL)
+              let targetResolution = CGSize(width: 1920, height: 1080)
+              let targetEncoding = ""
+              Task {
+                session.items = await createBeauItems(
+                  videoFileURLs, targetResolution, targetEncoding)
+                isReady = true
+              }
+            }
+          case .failure(let error):
+            print("\(error.localizedDescription)")
+          }
+        }
+        Button("Start", systemImage: "play") {
+          session.timeBegin = Date()
+          isReady = false
+          for i in session.items.indices {
+            Task {
+              await processBeauItem(session.items[i], session.tempFileNamePattern)
+            }
+          }
+        }
+        .labelStyle(.titleAndIcon)
+        .disabled(!isReady)
       }
-
     }
-    .disabled(!isReady)
   }
 }
 
 #Preview {
+  ContentView()
 }
