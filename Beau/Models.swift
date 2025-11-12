@@ -20,6 +20,7 @@ class BeauItem: ObservableObject {
   @Published var targetSize: Int64? = nil
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
+  @Published var isSelected: Bool = true
   init(
     sourceURL: URL,
     targetURL: URL,

@@ -285,6 +285,9 @@ func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
 
 func processBeauItem(_ item: BeauItem, _ tempFileNamePattern: String) async {
   do {
+    if !item.isSelected {
+      return
+    }
     item.completionPercentage = 0
     let tempFileURL = try getTempFileURL(
       from: item.sourceURL, pattern: tempFileNamePattern
