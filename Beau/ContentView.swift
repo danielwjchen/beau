@@ -34,6 +34,8 @@ struct ContentView: View {
           Text(preset.label).tag(preset)
         }
       }
+      .padding(.vertical, 8.0)
+      .padding(.horizontal, 8.0)
       .onChange(of: selectedVideoPreset) {
         session.resolution = "\(selectedVideoPreset.width)x\(selectedVideoPreset.height)"
         session.encoding = selectedVideoPreset.encoding
