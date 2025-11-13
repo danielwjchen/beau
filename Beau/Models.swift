@@ -21,6 +21,7 @@ class BeauItem: ObservableObject {
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
   @Published var isSelected: Bool = true
+  @Published var replacesSource: Bool = true
   init(
     sourceURL: URL,
     targetURL: URL,
@@ -62,6 +63,7 @@ class BeauSession: ObservableObject {
   var targetURL: URL?
   var preservesFolders: Bool
   @Published var items: [BeauItem] = []
+  @Published var replacesSource: Bool = true
   var timeBegin: Date?
   var timeEnd: Date?
 

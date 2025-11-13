@@ -5,6 +5,7 @@
 //  Created by Daniel Chen on 10/20/25.
 //
 
+import AVFoundation
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -24,9 +25,24 @@ struct ContentView: View {
   @State private var isImporterPresented: Bool = false
   @State private var isReady: Bool = false
 
+  @State private var selectedVideoPreset: VideoPreset = .defaultValue
+
   var body: some View {
-    List(session.items, id: \.sourceURL) { item in
-      BeauItemView(item: item)
+    VStack(alignment: .leading) {
+      Picker("Target", selection: $selectedVideoPreset) {
+        ForEach(VideoPreset.all) { preset in
+          Text(preset.label).tag(preset)
+        }
+      }
+      .onChange(of: selectedVideoPreset) {
+        session.resolution = "\(selectedVideoPreset.width)x\(selectedVideoPreset.height)"
+        session.encoding = selectedVideoPreset.encoding
+        setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
+      }
+
+      List(session.items, id: \.sourceURL) { item in
+        BeauItemView(item: item)
+      }
     }
     .toolbar {
       ToolbarItemGroup(placement: .primaryAction) {
@@ -50,7 +66,9 @@ struct ContentView: View {
               let targetEncoding = ""
               Task {
                 session.items = await createBeauItems(
-                  videoFileURLs, targetResolution, targetEncoding)
+                  videoFileURLs, targetResolution, targetEncoding
+                )
+                setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
                 isReady = true
               }
             }
@@ -61,11 +79,12 @@ struct ContentView: View {
         Button("Start", systemImage: "play") {
           session.timeBegin = Date()
           isReady = false
-          for i in session.items.indices {
-            Task {
+          Task {
+            for i in session.items.indices {
               await processBeauItem(session.items[i], session.tempFileNamePattern)
             }
           }
+          session.timeEnd = Date()
         }
         .labelStyle(.titleAndIcon)
         .disabled(!isReady)

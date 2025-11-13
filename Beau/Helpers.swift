@@ -299,7 +299,7 @@ func processBeauItem(_ item: BeauItem, _ tempFileNamePattern: String) async {
       item.completionPercentage = progress
     }
     item.targetSize = try getFileSize(at: tempFileURL)
-    if item.targetURL.path == item.sourceURL.path {
+    if item.targetURL.path == item.sourceURL.path || item.replacesSource {
       let isAbleToMoveSourceFileToTrash = try moveFileToTrashIfExists(
         item.sourceURL
       )
@@ -315,4 +315,57 @@ func processBeauItem(_ item: BeauItem, _ tempFileNamePattern: String) async {
     item.error = error.localizedDescription
   }
   item.timeEnd = Date()
+}
+
+struct VideoPreset: Identifiable, Hashable {
+  let id: String
+  let label: String
+  let width: CGFloat
+  let height: CGFloat
+  let encoding: String
+
+  static let defaultValue: VideoPreset = .init(
+    id: AVAssetExportPreset1920x1080,
+    label: "Full HD (1080p)",
+    width: 1920,
+    height: 1080,
+    encoding: "avc"
+  )
+
+  static let all: [VideoPreset] = [
+    .init(
+      id: AVAssetExportPreset3840x2160, label: "4K (2160p)", width: 3840, height: 2160,
+      encoding: "avc"),
+    defaultValue,
+    .init(
+      id: AVAssetExportPreset1280x720, label: "HD (720p)", width: 1280, height: 720,
+      encoding: "avc"),
+    .init(
+      id: AVAssetExportPreset960x540, label: "qHD (540p)", width: 960, height: 540,
+      encoding: "avc"),
+    .init(
+      id: AVAssetExportPreset640x480, label: "SD (480p)", width: 640, height: 480,
+      encoding: "avc"),
+    .init(
+      id: AVAssetExportPresetLowQuality, label: "Low Quality (360p)", width: 480,
+      height: 360, encoding: "avc"),
+  ]
+}
+
+func setBeauItemsIsSelectedByVideoPreset(
+  _ items: [BeauItem], _ videoPreset: VideoPreset
+) {
+  items.forEach({ item in
+    if let width = item.sourceResolution?.width,
+      let height = item.sourceResolution?.height
+    {
+      item.isSelected =
+        ((width > videoPreset.width
+          && height > videoPreset.height)
+          || (height > videoPreset.width
+            && width > videoPreset.height))
+    } else {
+      item.isSelected = false
+    }
+  })
 }
