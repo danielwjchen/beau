@@ -50,8 +50,14 @@ struct ContentView: View {
         setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
       }
 
-      List(session.items, id: \.sourceURL) { item in
-        BeauItemView(item: item)
+      if let sourceURL = session.sourceURL {
+        BeauBreadcrumbPathView(url: sourceURL)
+          .padding(8)
+        List(session.items, id: \.sourceURL) { item in
+          BeauItemView(item: item, sourceURL)
+        }
+      } else {
+        Spacer()
       }
     }
     .toolbar {
@@ -88,6 +94,7 @@ struct ContentView: View {
             print("\(error.localizedDescription)")
           }
         }
+        .disabled(session.timeBegin != nil && session.timeEnd == nil)
         Button("Start", systemImage: "play") {
           session.timeBegin = Date()
           isReady = false

@@ -2,6 +2,12 @@ import SwiftUI
 
 struct BeauBreadcrumbPathView: View {
   let url: URL
+  let hasLeadingChevron: Bool
+
+  init(url: URL, hasLeadingChevron: Bool = false) {
+    self.url = url
+    self.hasLeadingChevron = hasLeadingChevron
+  }
 
   private var pathComponents: [URL] {
     var components: [URL] = []
@@ -18,6 +24,11 @@ struct BeauBreadcrumbPathView: View {
   var body: some View {
     ScrollView(.horizontal, showsIndicators: false) {
       HStack(spacing: 4) {
+        if hasLeadingChevron {
+          Image(systemName: "chevron.right")
+            .font(.caption)
+            .foregroundColor(.secondary)
+        }
         ForEach(Array(pathComponents.enumerated()), id: \.element) { index, element in
           Text(element.lastPathComponent)
             .font(.caption)
@@ -36,5 +47,5 @@ struct BeauBreadcrumbPathView: View {
 }
 
 #Preview {
-    BeauBreadcrumbPathView(url: URL(string: "/home/foobar/Documents/Secrets/config.json")!)
+  BeauBreadcrumbPathView(url: URL(string: "/home/foobar/Documents/Secrets/config.json")!)
 }

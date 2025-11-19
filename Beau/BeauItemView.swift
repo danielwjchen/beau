@@ -3,8 +3,14 @@ import SwiftUI
 struct BeauItemView: View {
   @ObservedObject var item: BeauItem
   @State private var thumbnail = Image(systemName: "video")
+  let relativeURL: URL
 
-  init(item: BeauItem) {
+  init(item: BeauItem, _ sourceURL: URL) {
+    let urlString = item.sourceURL.path.replacingOccurrences(
+      of: sourceURL.path,
+      with: ""
+    )
+    self.relativeURL = URL(fileURLWithPath: urlString).deletingLastPathComponent()
     self.item = item
   }
 
@@ -17,11 +23,11 @@ struct BeauItemView: View {
         HStack(alignment: .center, spacing: 2) {
           self.thumbnail
             .opacity(item.isSelected ? 1 : 0.5)
-        }.frame(width: 200)
+        }.frame(maxWidth: 200)
         VStack(alignment: .leading) {
-          BeauBreadcrumbPathView(url: item.sourceURL.deletingLastPathComponent())
+          BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
             .padding(.bottom, 4)
-          HStack {
+          HStack(alignment: .center) {
             BeauNameAndSizeView(
               name: item.sourceURL.lastPathComponent,
               resolution: item.sourceResolution,
@@ -70,6 +76,6 @@ struct BeauItemView: View {
     sourceEncoding: "hevc",
     sourceFileSize: 123456
   )
-  BeauItemView(item: item)
-        .padding(10)
+  BeauItemView(item: item, URL(string: "/home/foobar/Documents")!)
+    .padding(10)
 }
