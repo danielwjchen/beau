@@ -62,8 +62,8 @@ struct BeauItemView: View {
 
 #Preview {
   let item = BeauItem(
-    sourceURL: URL(string: "files://location/sample.mov")!,
-    targetURL: URL(string: "files://location/sample.mp4")!,
+    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!,
+    targetURL: URL(string: "/home/foobar/Documents/sample.mp4")!,
     targetResolution: CGSize(width: 1920, height: 1080),
     targetEncoding: "avc",
     sourceResolution: CGSize(width: 3840, height: 2160),
@@ -71,4 +71,5 @@ struct BeauItemView: View {
     sourceFileSize: 123456
   )
   BeauItemView(item: item)
+        .padding(10)
 }
