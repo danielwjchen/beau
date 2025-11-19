@@ -16,19 +16,25 @@ struct BeauItemView: View {
           .toggleStyle(.checkbox)
         HStack(alignment: .center, spacing: 2) {
           self.thumbnail
-                .opacity(item.isSelected ? 1 : 0.5)
+            .opacity(item.isSelected ? 1 : 0.5)
         }.frame(width: 200)
-        BeauNameAndSizeView(
-          name: item.sourceURL.lastPathComponent,
-          resolution: item.sourceResolution,
-          fileSize: item.sourceSize
-        )
-        Spacer()
-        BeauNameAndSizeView(
-          name: item.targetURL.lastPathComponent,
-          resolution: item.targetResolution,
-          fileSize: item.targetSize
-        )
+        VStack(alignment: .leading) {
+          BeauBreadcrumbPathView(url: item.sourceURL.deletingLastPathComponent())
+            .padding(.bottom, 4)
+          HStack {
+            BeauNameAndSizeView(
+              name: item.sourceURL.lastPathComponent,
+              resolution: item.sourceResolution,
+              fileSize: item.sourceSize
+            )
+            Spacer()
+            BeauNameAndSizeView(
+              name: item.targetURL.lastPathComponent,
+              resolution: item.targetResolution,
+              fileSize: item.targetSize
+            )
+          }
+        }
       }
       ProgressView(value: item.completionPercentage)
         .opacity(item.completionPercentage == nil ? 0 : 1)
