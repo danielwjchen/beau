@@ -24,8 +24,16 @@ struct ContentView: View {
 
   @State private var isImporterPresented: Bool = false
   @State private var isReady: Bool = false
-
   @State private var selectedVideoPreset: VideoPreset = .defaultValue
+  @State private var isAccessing: Bool = false
+
+  private func cleanUpAccess() {
+    if isAccessing {
+      if let sourceURL = session.sourceURL {
+        sourceURL.stopAccessingSecurityScopedResource()
+      }
+    }
+  }
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -58,9 +66,11 @@ struct ContentView: View {
           allowedContentTypes: allowedContentTypes,
           allowsMultipleSelection: false
         ) { result in
+          cleanUpAccess()
           switch result {
           case .success(let urls):
             if let sourceURL = urls.first {
+              self.isAccessing = sourceURL.startAccessingSecurityScopedResource()
               session.sourceURL = sourceURL
               session.targetURL = sourceURL
               let videoFileURLs = getVideoFileURLs(in: sourceURL)
@@ -71,7 +81,7 @@ struct ContentView: View {
                   videoFileURLs, targetResolution, targetEncoding
                 )
                 setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
-                isReady = true
+                isReady = session.items.count > 0
               }
             }
           case .failure(let error):
@@ -85,8 +95,9 @@ struct ContentView: View {
             for i in session.items.indices {
               await processBeauItem(session.items[i], session.tempFileNamePattern)
             }
+            session.timeEnd = Date()
+            cleanUpAccess()
           }
-          session.timeEnd = Date()
         }
         .labelStyle(.titleAndIcon)
         .disabled(!isReady)

@@ -33,15 +33,7 @@ func getVideoFileURLs(in folderURL: URL) -> [URL] {
   let videoExtensions: Set<String> = [
     "mp4", "mov", "m4v", "avi", "mkv", "wmv", "flv", "webm",
   ]
-  let isAccessing = folderURL.startAccessingSecurityScopedResource()
 
-  defer {
-    if isAccessing {
-      folderURL.stopAccessingSecurityScopedResource()
-    }
-  }
-
-  // Use an enumerator for a recursive, memory-efficient scan.
   guard
     let enumerator = fileManager.enumerator(
       at: folderURL,
