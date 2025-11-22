@@ -72,11 +72,14 @@ func getFileSize(at url: URL) throws -> Int64? {
 /// - Returns: An array of URLs pointing to the 4K video files found.
 func createBeauItems(
   _ videoFileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
-  _ targetFileExtension: String = "mp4"
+  _ targetFileExtension: String = "mp4",
+  progressHandler: @escaping (Float, String) -> Void
 ) async -> [BeauItem] {
 
   var result: [BeauItem] = []
-  for case let videoFileURL in videoFileURLs {
+  for (index, videoFileURL) in videoFileURLs.enumerated() {
+    let progressPercentage = Float((index + 1) / videoFileURLs.count)
+    progressHandler(progressPercentage, "Found video: \(videoFileURL.lastPathComponent)")
     let targetURL = videoFileURL.deletingPathExtension().appendingPathExtension(targetFileExtension)
     let item = BeauItem(
       sourceURL: videoFileURL,
@@ -85,17 +88,19 @@ func createBeauItems(
       targetEncoding: targetEncoding
     )
     do {
-      let asset: AVAsset = AVAsset(url: videoFileURL)
+      let asset: AVAsset = AVAsset(url: item.sourceURL)
+      progressHandler(progressPercentage, "Loading file for \(item.sourceURL.lastPathComponent)")
       guard let videoTrack: AVAssetTrack = try await asset.loadTracks(withMediaType: .video).first
       else {
         throw BeauError.UnableToLoadVideoTrack()
       }
+      progressHandler(
+        progressPercentage, "Loading resolution for \(item.sourceURL.lastPathComponent)")
       item.sourceResolution = try await videoTrack.load(.naturalSize)
-      item.sourceSize = try getFileSize(at: videoFileURL)
+      item.sourceSize = try getFileSize(at: item.sourceURL)
     } catch {
       item.error = error.localizedDescription
     }
-    // Check the video resolution.
     result.append(item)
   }
 

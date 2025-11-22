@@ -26,6 +26,8 @@ struct ContentView: View {
   @State private var isReady: Bool = false
   @State private var selectedVideoPreset: VideoPreset = .defaultValue
   @State private var isAccessing: Bool = false
+  @State public var itemProgressPercentage: Float? = nil
+  @State public var itemProgressMessage: String = ""
 
   private func cleanUpAccess() {
     if isAccessing {
@@ -59,6 +61,12 @@ struct ContentView: View {
       } else {
         Spacer()
       }
+      if session.sourceURL != nil && session.items.count == 0 {
+        Text(itemProgressMessage)
+          .font(.caption)
+          .padding(.leading, 8)
+        ProgressView(value: itemProgressPercentage)
+      }
     }
     .toolbar {
       ToolbarItemGroup(placement: .primaryAction) {
@@ -72,6 +80,9 @@ struct ContentView: View {
           allowedContentTypes: allowedContentTypes,
           allowsMultipleSelection: false
         ) { result in
+          itemProgressPercentage = nil
+          itemProgressMessage = ""
+          session.items = []
           cleanUpAccess()
           switch result {
           case .success(let urls):
@@ -85,7 +96,10 @@ struct ContentView: View {
               Task {
                 session.items = await createBeauItems(
                   videoFileURLs, targetResolution, targetEncoding
-                )
+                ) { progressPercentage, message in
+                  self.itemProgressPercentage = progressPercentage
+                  self.itemProgressMessage = message
+                }
                 setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
                 isReady = session.items.count > 0
               }
