@@ -64,8 +64,15 @@ struct ContentView: View {
       if session.sourceURL != nil && session.items.count == 0 {
         Text(itemProgressMessage)
           .font(.caption)
+          .padding(.top, 4)
           .padding(.leading, 8)
+          .padding(.trailing, 8)
+          .padding(.bottom, 2)
         ProgressView(value: itemProgressPercentage)
+          .padding(.top, 2)
+          .padding(.leading, 8)
+          .padding(.trailing, 8)
+          .padding(.bottom, 8)
       }
     }
     .toolbar {
