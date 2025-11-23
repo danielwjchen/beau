@@ -6,10 +6,17 @@
 //
 import Foundation
 
+enum BeauContentType {
+  case video
+  case image
+  case other
+}
+
 class BeauItem: ObservableObject {
   var sourceURL: URL
   var targetURL: URL
   var rename: String = ""
+  var contentType: BeauContentType = .other
   @Published var timeBegin: Date?
   @Published var timeEnd: Date?
   var sourceResolution: CGSize?
@@ -26,12 +33,14 @@ class BeauItem: ObservableObject {
     sourceURL: URL,
     targetURL: URL,
     targetResolution: CGSize,
-    targetEncoding: String
+    targetEncoding: String,
+    contentType: BeauContentType
   ) {
     self.sourceURL = sourceURL
     self.targetURL = targetURL
     self.targetResolution = targetResolution
     self.targetEncoding = targetEncoding
+    self.contentType = contentType
   }
   init(
     sourceURL: URL,

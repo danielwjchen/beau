@@ -4,6 +4,7 @@ struct BeauItemView: View {
   @ObservedObject var item: BeauItem
   @State private var thumbnail = Image(systemName: "video")
   let relativeURL: URL
+  let thumbnailSize: CGSize = CGSize(width: 100, height: 100)
 
   init(item: BeauItem, _ sourceURL: URL) {
     let urlString = item.sourceURL.path.replacingOccurrences(
@@ -23,7 +24,7 @@ struct BeauItemView: View {
         HStack(alignment: .center, spacing: 2) {
           self.thumbnail
             .opacity(item.isSelected ? 1 : 0.5)
-        }.frame(maxWidth: 200)
+        }.frame(maxWidth: 100)
         VStack(alignment: .leading) {
           BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
             .padding(.bottom, 4)
@@ -55,14 +56,11 @@ struct BeauItemView: View {
     }
     .task {
       do {
-        let cgImage = try await generateThumbnail(for: item.sourceURL)
-        #if os(macOS)
-          let nsImage = NSImage(cgImage: cgImage, size: .zero)
-          self.thumbnail = Image(nsImage: nsImage)
-        #else
-          let uiImage = UIImage(cgImage: cgImage)
-          self.thumbnail = Image(uiImage: uiImage)
-        #endif
+        let cgImage = try await generateThumbnail(
+          for: item.sourceURL, size: thumbnailSize
+        )
+        let nsImage = NSImage(cgImage: cgImage, size: .zero)
+        self.thumbnail = Image(nsImage: nsImage)
       } catch {
         item.error = "Thumbnail error: \(error.localizedDescription)"
       }

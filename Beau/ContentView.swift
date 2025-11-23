@@ -97,12 +97,12 @@ struct ContentView: View {
               self.isAccessing = sourceURL.startAccessingSecurityScopedResource()
               session.sourceURL = sourceURL
               session.targetURL = sourceURL
-              let videoFileURLs = getVideoFileURLs(in: sourceURL)
+              let fileURLs = getFileURLs(in: sourceURL)
               let targetResolution = CGSize(width: 1920, height: 1080)
               let targetEncoding = ""
               Task {
                 session.items = await createBeauItems(
-                  videoFileURLs, targetResolution, targetEncoding
+                  fileURLs, targetResolution, targetEncoding
                 ) { progressPercentage, message in
                   self.itemProgressPercentage = progressPercentage
                   self.itemProgressMessage = message

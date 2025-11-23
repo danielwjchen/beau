@@ -6,8 +6,11 @@
 //
 
 import AVFoundation
+import AppKit
 import CoreGraphics
 import Foundation
+import QuickLookThumbnailing
+import UniformTypeIdentifiers
 
 #if os(macOS)
   import AppKit
@@ -22,17 +25,13 @@ enum BeauError: Error {
   case UnknownExportError(String = "Unknown export error")
   case Cancelled(String = "Export cancelled")
   case UnableToLoadVideoTrack(String = "Unable to load video track")
+  case UnableToLoadImage(String = "Unable to load image")
   case UnableToRemoveSourceFile(String = "Unable to remove source file")
 }
 
-func getVideoFileURLs(in folderURL: URL) -> [URL] {
+func getFileURLs(in folderURL: URL) -> [URL] {
   let fileManager = FileManager.default
   var result: [URL] = []
-
-  // Define a set of common video file extensions to filter by.
-  let videoExtensions: Set<String> = [
-    "mp4", "mov", "m4v", "avi", "mkv", "wmv", "flv", "webm",
-  ]
 
   guard
     let enumerator = fileManager.enumerator(
@@ -47,14 +46,11 @@ func getVideoFileURLs(in folderURL: URL) -> [URL] {
   }
   for case let fileURL as URL in enumerator {
     do {
-      // Check if the item is a regular file.
       let fileAttributes = try fileURL.resourceValues(forKeys: [.isRegularFileKey])
       if fileAttributes.isRegularFile != true {
         continue
       }
-      if videoExtensions.contains(fileURL.pathExtension.lowercased()) {
-        result.append(fileURL)
-      }
+      result.append(fileURL)
     } catch {
       print("Error accessing file \(fileURL.path): \(error)")
     }
@@ -71,35 +67,41 @@ func getFileSize(at url: URL) throws -> Int64? {
 /// - Parameter folderURL: The URL of the folder to begin the search.
 /// - Returns: An array of URLs pointing to the 4K video files found.
 func createBeauItems(
-  _ videoFileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
+  _ fileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
   _ targetFileExtension: String = "mp4",
   progressHandler: @escaping (Float, String) -> Void
 ) async -> [BeauItem] {
 
   var result: [BeauItem] = []
   progressHandler(0, "Loading files")
-  for (index, videoFileURL) in videoFileURLs.enumerated() {
-    let progressPercentage = Float((index + 1) / videoFileURLs.count)
-    progressHandler(progressPercentage, "\(videoFileURL.lastPathComponent) is found")
-    let targetURL = videoFileURL.deletingPathExtension().appendingPathExtension(targetFileExtension)
+  for (index, fileURL) in fileURLs.enumerated() {
+    let progressPercentage = Float((index + 1) / fileURLs.count)
+    progressHandler(progressPercentage, "\(fileURL.lastPathComponent) is found")
+    let beauContentType = getBeauContentType(for: fileURL)
+    if beauContentType == .other {
+      continue
+    }
+    let targetURL = fileURL.deletingPathExtension().appendingPathExtension(targetFileExtension)
     let item = BeauItem(
-      sourceURL: videoFileURL,
+      sourceURL: fileURL,
       targetURL: targetURL,
       targetResolution: targetResolution,
-      targetEncoding: targetEncoding
+      targetEncoding: targetEncoding,
+      contentType: beauContentType
     )
     do {
-      let asset: AVAsset = AVAsset(url: item.sourceURL)
-      progressHandler(progressPercentage, "\(item.sourceURL.lastPathComponent): Loading file")
-      guard let videoTrack: AVAssetTrack = try await asset.loadTracks(withMediaType: .video).first
-      else {
-        throw BeauError.UnableToLoadVideoTrack()
-      }
-      progressHandler(
-        progressPercentage, "\(item.sourceURL.lastPathComponent): Loading video properties"
-      )
-      item.sourceResolution = try await videoTrack.load(.naturalSize)
       item.sourceSize = try getFileSize(at: item.sourceURL)
+      if item.contentType == .video {
+        progressHandler(
+          progressPercentage, "\(item.sourceURL.lastPathComponent): Loading video properties"
+        )
+        item.sourceResolution = try await getVideoDimensions(from: item.sourceURL)
+      } else if item.contentType == .image {
+        progressHandler(
+          progressPercentage, "\(item.sourceURL.lastPathComponent): Loading image properties"
+        )
+        item.sourceResolution = try await getImageDimensions(from: item.sourceURL)
+      }
     } catch {
       item.error = error.localizedDescription
     }
@@ -199,73 +201,20 @@ func getTempFileURL(
   return result
 }
 
-func resizeCGImage(_ image: CGImage, to size: CGSize) -> CGImage? {
-  guard let colorSpace = image.colorSpace else { return nil }
-  guard
-    let context = CGContext(
-      data: nil,
-      width: Int(size.width),
-      height: Int(size.height),
-      bitsPerComponent: image.bitsPerComponent,
-      bytesPerRow: 0,
-      space: colorSpace,
-      bitmapInfo: image.bitmapInfo.rawValue
-    )
-  else {
-    return nil
-  }
+func generateThumbnail(for url: URL, size: CGSize) async throws -> CGImage {
+  let request = QLThumbnailGenerator.Request(
+    fileAt: url,
+    size: size,
+    scale: NSScreen.main?.backingScaleFactor ?? 2,
+    representationTypes: .all
+  )
 
-  context.interpolationQuality = .high
-  context.draw(image, in: CGRect(origin: .zero, size: size))
-  return context.makeImage()
-}
-
-func generateThumbnail(
-  for videoURL: URL,
-  targetHeight: CGFloat = 100,
-  at time: CMTime = CMTime(seconds: 1, preferredTimescale: 60)
-)
-  async throws -> CGImage
-{
   return try await withCheckedThrowingContinuation { continuation in
-    let asset = AVAsset(url: videoURL)
-    let imageGenerator = AVAssetImageGenerator(asset: asset)
-    imageGenerator.appliesPreferredTrackTransform = true
-    imageGenerator.requestedTimeToleranceAfter = .zero
-    imageGenerator.requestedTimeToleranceBefore = .zero
-
-    // Get the first frame at time = 1 second (you can adjust this)
-    let time = CMTime(seconds: 1.0, preferredTimescale: 600)
-
-    // Generate asynchronously
-    imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) {
-      _, cgImage, _, result, error in
-      if let error = error {
-        continuation.resume(throwing: error)
-        return
-      }
-
-      guard let cgImage = cgImage else {
-        continuation.resume(
-          throwing: NSError(
-            domain: "ThumbnailError", code: -1,
-            userInfo: [NSLocalizedDescriptionKey: "Failed to generate thumbnail"]))
-        return
-      }
-
-      // Scale the image to target height
-      let originalWidth = CGFloat(cgImage.width)
-      let originalHeight = CGFloat(cgImage.height)
-      let scale = targetHeight / originalHeight
-      let newSize = CGSize(width: originalWidth * scale, height: targetHeight)
-
-      if let resized = resizeCGImage(cgImage, to: newSize) {
-        continuation.resume(returning: resized)
+    QLThumbnailGenerator.shared.generateBestRepresentation(for: request) { rep, error in
+      if let rep = rep {
+        continuation.resume(returning: rep.cgImage)
       } else {
-        continuation.resume(
-          throwing: NSError(
-            domain: "ThumbnailResizeError", code: -2,
-            userInfo: [NSLocalizedDescriptionKey: "Failed to resize thumbnail"]))
+        continuation.resume(throwing: error ?? NSError(domain: "QL", code: -1))
       }
     }
   }
@@ -299,10 +248,21 @@ func processBeauItem(_ item: BeauItem, _ tempFileNamePattern: String) async {
       from: item.sourceURL, pattern: tempFileNamePattern
     )
     item.timeBegin = Date()
-    try await encodeVideoWithProgress(
-      from: item.sourceURL, to: tempFileURL
-    ) { progress in
-      item.completionPercentage = progress
+    if item.contentType == .video {
+      // @todo: support encoding
+      try await encodeVideoWithProgress(
+        from: item.sourceURL, to: tempFileURL
+      ) { progress in
+        item.completionPercentage = progress
+      }
+    } else if item.contentType == .image {
+      try await optimizeImageWithProgress(
+        from: item.sourceURL, to: tempFileURL
+      ) { progress in
+        item.completionPercentage = progress
+      }
+    } else {
+      throw BeauError.UnknownExportError("Unsupported content type")
     }
     item.targetSize = try getFileSize(at: tempFileURL)
     if item.targetURL.path == item.sourceURL.path || item.replacesSource {
@@ -374,4 +334,127 @@ func setBeauItemsIsSelectedByVideoPreset(
       item.isSelected = false
     }
   })
+}
+
+func getBeauContentType(for url: URL) -> BeauContentType {
+  do {
+    if let contentType = try url.resourceValues(forKeys: [.contentTypeKey]).contentType {
+      if contentType.conforms(to: .movie) || contentType.conforms(to: .video) {
+        return .video
+      } else if contentType.conforms(to: .image) {
+        return .image
+      }
+    }
+  } catch {
+    print("Error getting content type for URL \(url): \(error)")
+  }
+  return .other
+}
+
+func optimizeImageWithProgress(
+  from sourceURL: URL,
+  to targetURL: URL,
+  maxDimension: CGFloat = 1600,
+  quality: CGFloat = 0.75,
+  progressHandler: @escaping (Float) -> Void
+) async throws {
+  progressHandler(0.0)
+  guard let imageData = try? Data(contentsOf: sourceURL) else {
+    throw BeauError.UnknownExportError("Could not load file from source URL.")
+  }
+
+  guard let image = NSImage(data: imageData) else {
+    throw BeauError.UnknownExportError("Could not load image from source URL.")
+  }
+
+  progressHandler(0.1)
+
+  let originalSize = image.size
+  let scale: CGFloat
+
+  if originalSize.width > maxDimension || originalSize.height > maxDimension {
+    let maxCurrentDimension = max(originalSize.width, originalSize.height)
+    scale = maxDimension / maxCurrentDimension
+  } else {
+    scale = 1.0
+  }
+
+  let newSize = NSSize(
+    width: originalSize.width * scale,
+    height: originalSize.height * scale
+  )
+
+  // Resizing
+  let resizedImage = NSImage(size: newSize)
+  resizedImage.lockFocus()
+  image.draw(
+    in: NSRect(origin: .zero, size: newSize),
+    from: NSRect(origin: .zero, size: originalSize),
+    operation: .sourceOver,
+    fraction: 1.0)
+  resizedImage.unlockFocus()
+
+  guard let tiffData = resizedImage.tiffRepresentation else {
+    throw BeauError.UnknownExportError("Could not load bitmap data from source URL.")
+  }
+  progressHandler(0.4)
+  guard let bitmapRep = NSBitmapImageRep(data: tiffData) else {
+    throw BeauError.UnknownExportError("Could not convert bitmap data from source URL.")
+  }
+
+  progressHandler(0.6)
+  let properties: [NSBitmapImageRep.PropertyKey: Any] = [
+    .compressionFactor: quality
+  ]
+
+  guard let jpegData = bitmapRep.representation(using: .jpeg, properties: properties) else {
+    throw BeauError.UnknownExportError("Could not convert jpeg data from source URL.")
+  }
+
+  progressHandler(0.7)
+  do {
+    try jpegData.write(to: targetURL, options: .atomic)
+    progressHandler(1.0)
+  } catch {
+    throw BeauError.UnknownExportError("Could not write to \(targetURL).")
+  }
+}
+
+func getVideoDimensions(from url: URL) async throws -> CGSize {
+  let asset: AVAsset = AVAsset(url: url)
+  guard let videoTrack: AVAssetTrack = try await asset.loadTracks(withMediaType: .video).first
+  else {
+    throw BeauError.UnableToLoadVideoTrack()
+  }
+  let result = try await videoTrack.load(.naturalSize)
+  return result
+}
+
+func getImageDimensions(from url: URL) async throws -> CGSize {
+
+  guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil) else {
+    throw BeauError.UnableToLoadImage()
+  }
+
+  let options: [NSString: Any] = [
+    kCGImageSourceShouldCache as NSString: false  // Crucial: don't cache the full image data
+  ]
+
+  guard
+    let imageProperties = CGImageSourceCopyPropertiesAtIndex(
+      imageSource, 0, options as CFDictionary) as? [NSString: Any]
+  else {
+    throw BeauError.UnableToLoadImage("Could not retrieve image properties.")
+  }
+
+  // 3. Extract Width and Height.
+  // ImageIO properties are often stored as CGImageProperty-related keys.
+  guard let pixelWidth = imageProperties[kCGImagePropertyPixelWidth] as? CGFloat,
+    let pixelHeight = imageProperties[kCGImagePropertyPixelHeight] as? CGFloat
+  else {
+    throw BeauError.UnableToLoadImage("Could not load image dimeensions.")
+  }
+
+  let result = CGSize(width: pixelWidth, height: pixelHeight)
+  return result
 }
