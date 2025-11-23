@@ -43,7 +43,11 @@ struct BeauItemView: View {
         }
       }
       ProgressView(value: item.completionPercentage)
-        .opacity(item.completionPercentage == nil ? 0 : 1)
+        .opacity(
+          item.completionPercentage == nil
+            || item.completionPercentage! >= 1
+            ? 0 : 1
+        )
       if !item.error.isEmpty {
         Text(item.error)
           .foregroundColor(.red)

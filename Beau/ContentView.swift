@@ -62,7 +62,7 @@ struct ContentView: View {
         Spacer()
       }
       if session.sourceURL != nil && session.items.count == 0 {
-        Text(itemProgressMessage)
+        BeauLoadingView(itemProgressMessage)
           .font(.caption)
           .padding(.top, 4)
           .padding(.leading, 8)

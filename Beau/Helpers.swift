@@ -77,9 +77,10 @@ func createBeauItems(
 ) async -> [BeauItem] {
 
   var result: [BeauItem] = []
+  progressHandler(0, "Loading files")
   for (index, videoFileURL) in videoFileURLs.enumerated() {
     let progressPercentage = Float((index + 1) / videoFileURLs.count)
-    progressHandler(progressPercentage, "Found video: \(videoFileURL.lastPathComponent)")
+    progressHandler(progressPercentage, "\(videoFileURL.lastPathComponent) is found")
     let targetURL = videoFileURL.deletingPathExtension().appendingPathExtension(targetFileExtension)
     let item = BeauItem(
       sourceURL: videoFileURL,
@@ -89,13 +90,14 @@ func createBeauItems(
     )
     do {
       let asset: AVAsset = AVAsset(url: item.sourceURL)
-      progressHandler(progressPercentage, "Loading file for \(item.sourceURL.lastPathComponent)")
+      progressHandler(progressPercentage, "\(item.sourceURL.lastPathComponent): Loading file")
       guard let videoTrack: AVAssetTrack = try await asset.loadTracks(withMediaType: .video).first
       else {
         throw BeauError.UnableToLoadVideoTrack()
       }
       progressHandler(
-        progressPercentage, "Loading resolution for \(item.sourceURL.lastPathComponent)")
+        progressPercentage, "\(item.sourceURL.lastPathComponent): Loading video properties"
+      )
       item.sourceResolution = try await videoTrack.load(.naturalSize)
       item.sourceSize = try getFileSize(at: item.sourceURL)
     } catch {
