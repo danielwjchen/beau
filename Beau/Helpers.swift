@@ -80,7 +80,7 @@ func createBeauItems(
       do {
         item.sourceSize = try getFileSize(at: item.sourceURL)
         progressHandler(
-          progressPercentage, "\(item.sourceURL.lastPathComponent): Loading video properties"
+          progressPercentage, "\(item.sourceURL.lastPathComponent): Loading properties"
         )
         item.sourceResolution = try await BeauMediaOptimizableType.getDimensions(
           from: item.sourceURL
