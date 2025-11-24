@@ -71,8 +71,10 @@ func createBeauItems(
   var result: [any BeauMediaOptimizable] = []
   progressHandler(0, "Loading files")
   for (index, fileURL) in fileURLs.enumerated() {
-    let progressPercentage = Float((index + 1) / fileURLs.count)
-    progressHandler(progressPercentage, "\(fileURL.lastPathComponent) is found")
+    let itemNumber = index + 1
+    let progressPercentage = Float((itemNumber) / fileURLs.count)
+    let progressMessage = "\(itemNumber)/\(fileURLs.count)"
+    progressHandler(progressPercentage, "\(progressMessage) \(fileURL.lastPathComponent) is found")
     if let BeauMediaOptimizableType = getBeauMediaOptimizableType(for: fileURL) {
       let item = BeauMediaOptimizableType.init(
         sourceURL: fileURL
@@ -80,14 +82,16 @@ func createBeauItems(
       do {
         item.sourceSize = try getFileSize(at: item.sourceURL)
         progressHandler(
-          progressPercentage, "\(item.sourceURL.lastPathComponent): Loading properties"
+          progressPercentage,
+          "\(progressMessage) \(item.sourceURL.lastPathComponent): Loading properties"
         )
         item.sourceResolution = try await BeauMediaOptimizableType.getDimensions(
           from: item.sourceURL
         )
         item.updateTargetResolution(targetResolution)
         progressHandler(
-          progressPercentage, "\(item.sourceURL.lastPathComponent): Generating thumbnail"
+          progressPercentage,
+          "\(progressMessage) \(item.sourceURL.lastPathComponent): Generating thumbnail"
         )
         item.thumbnail = try await generateThumbnail(
           for: item.sourceURL, size: thumbnailSize
@@ -98,7 +102,8 @@ func createBeauItems(
       result.append(item)
     } else {
       progressHandler(
-        progressPercentage, "\(fileURL.lastPathComponent): Skipped unsupported file type"
+        progressPercentage,
+        "\(progressMessage) \(fileURL.lastPathComponent): Skipped unsupported file type"
       )
       continue
     }
