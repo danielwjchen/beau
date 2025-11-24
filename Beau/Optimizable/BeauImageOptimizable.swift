@@ -31,35 +31,60 @@ class BeauImageOptimizable: BeauMediaOptimizable {
   {
     let quality: CGFloat = 0.75
     progressHandler(0.0)
+
     guard let imageData = try? Data(contentsOf: sourceURL) else {
       throw BeauError.UnknownExportError("Could not load file from source URL.")
     }
-
     guard let image = NSImage(data: imageData) else {
       throw BeauError.UnknownExportError("Could not load image from source URL.")
     }
-
+    let originalSize = image.size
     progressHandler(0.1)
 
-    // Resizing
-    let resizedImage = NSImage(size: targetResolution ?? image.size)
-    resizedImage.lockFocus()
+    // Use an explicit bitmap-backed NSBitmapImageRep at the desired pixel size
+    let targetSize = targetResolution ?? image.size
+    let pixelWidth = max(1, Int(round(targetSize.width)))
+    let pixelHeight = max(1, Int(round(targetSize.height)))
+
+    guard
+      let bitmapRep = NSBitmapImageRep(
+        bitmapDataPlanes: nil,
+        pixelsWide: pixelWidth,
+        pixelsHigh: pixelHeight,
+        bitsPerSample: 8,
+        samplesPerPixel: 4,
+        hasAlpha: true,
+        isPlanar: false,
+        colorSpaceName: NSColorSpaceName.deviceRGB,
+        bytesPerRow: 0,
+        bitsPerPixel: 0
+      )
+    else {
+      throw BeauError.UnknownExportError("Could not create bitmap representation.")
+    }
+
+    // Draw the source image into the bitmap rep at the requested pixel size.
+    NSGraphicsContext.saveGraphicsState()
+    guard let context = NSGraphicsContext(bitmapImageRep: bitmapRep) else {
+      NSGraphicsContext.restoreGraphicsState()
+      throw BeauError.UnknownExportError("Could not create graphics context for resizing.")
+    }
+    NSGraphicsContext.current = context
+    context.cgContext.interpolationQuality = .high
+
+    let drawRect = NSRect(x: 0, y: 0, width: CGFloat(pixelWidth), height: CGFloat(pixelHeight))
     image.draw(
-      in: NSRect(origin: .zero, size: targetResolution ?? image.size),
-      from: NSRect(origin: .zero, size: image.size),
-      operation: .sourceOver,
-      fraction: 1.0)
-    resizedImage.unlockFocus()
+      in: drawRect,
+      from: NSRect(origin: .zero, size: originalSize),
+      operation: .copy,
+      fraction: 1.0,
+      respectFlipped: true,
+      hints: nil
+    )
+    NSGraphicsContext.restoreGraphicsState()
 
-    guard let tiffData = resizedImage.tiffRepresentation else {
-      throw BeauError.UnknownExportError("Could not load bitmap data from source URL.")
-    }
     progressHandler(0.4)
-    guard let bitmapRep = NSBitmapImageRep(data: tiffData) else {
-      throw BeauError.UnknownExportError("Could not convert bitmap data from source URL.")
-    }
 
-    progressHandler(0.6)
     let properties: [NSBitmapImageRep.PropertyKey: Any] = [
       .compressionFactor: quality
     ]
