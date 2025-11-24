@@ -117,8 +117,8 @@ func is4KVideo(videoSize: CGSize) -> Bool {
 }
 
 func getTempFileURL(
-  from sourceURL: URL, pattern tempFileNamePattern: String,
-  as targetFileExtension: String = ".mp4"
+  from sourceURL: URL,
+  as targetFileExtension: String = ".tmp"
 ) throws -> URL {
   let folderURL = sourceURL.deletingLastPathComponent()
   var isDirectory: ObjCBool = false
@@ -128,7 +128,7 @@ func getTempFileURL(
     throw BeauError.DirectoryNotFound()
   }
   let originalFileName = sourceURL.deletingPathExtension().lastPathComponent
-  let tempFileName = originalFileName + tempFileNamePattern + targetFileExtension
+  let tempFileName = originalFileName + targetFileExtension
   let result = folderURL.appendingPathComponent(tempFileName)
   if FileManager.default.fileExists(atPath: result.path) {
     throw BeauError.FileExists()
