@@ -1,12 +1,12 @@
 import SwiftUI
 
-struct BeauItemView: View {
-  @ObservedObject var item: BeauItem
+struct BeauItemView<T: BeauMediaOptimizable>: View {
+  @ObservedObject var item: T
   @State private var thumbnail = Image(systemName: "video")
   let relativeURL: URL
   let thumbnailSize: CGSize = CGSize(width: 100, height: 100)
 
-  init(item: BeauItem, _ sourceURL: URL) {
+  init(_ item: T, _ sourceURL: URL) {
     let urlString = item.sourceURL.path.replacingOccurrences(
       of: sourceURL.path,
       with: ""
@@ -69,15 +69,14 @@ struct BeauItemView: View {
 }
 
 #Preview {
-  let item = BeauItem(
-    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!,
-    targetURL: URL(string: "/home/foobar/Documents/sample.mp4")!,
-    targetResolution: CGSize(width: 1920, height: 1080),
-    targetEncoding: "avc",
-    sourceResolution: CGSize(width: 3840, height: 2160),
-    sourceEncoding: "hevc",
-    sourceFileSize: 123456
+  let item = BeauVideoOptimizable(
+    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
   )
-  BeauItemView(item: item, URL(string: "/home/foobar/Documents")!)
+  // item.targetResolution = CGSize(width: 1920, height: 1080)
+  // item.targetEncoding = "avc"
+  // item.sourceResolution = CGSize(width: 3840, height: 2160)
+  // item.sourceEncoding = "hevc"
+  // item.sourceSize = 123456
+  BeauItemView(item, URL(string: "/home/foobar/Documents")!)
     .padding(10)
 }

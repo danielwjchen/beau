@@ -56,7 +56,17 @@ struct ContentView: View {
         BeauBreadcrumbPathView(url: sourceURL)
           .padding(8)
         List(session.items, id: \.sourceURL) { item in
-          BeauItemView(item: item, sourceURL)
+          // Type erasure to determine the concrete type of BeauMediaOptimizable
+          // this is necessary because a problem with Swift's language design
+          if item is BeauVideoOptimizable {
+            if let videoItem = item as? BeauVideoOptimizable {
+              BeauItemView(videoItem, sourceURL)
+            }
+          } else if item is BeauImageOptimizable {
+            if let imageItem = item as? BeauImageOptimizable {
+              BeauItemView(imageItem, sourceURL)
+            }
+          }
         }
       } else {
         Spacer()
@@ -121,7 +131,7 @@ struct ContentView: View {
           isReady = false
           Task {
             for i in session.items.indices {
-              await processBeauItem(session.items[i], session.tempFileNamePattern)
+              await processBeauMediaOptimizable(session.items[i], session.tempFileNamePattern)
             }
             session.timeEnd = Date()
             cleanUpAccess()
