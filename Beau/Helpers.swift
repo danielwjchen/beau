@@ -85,6 +85,7 @@ func createBeauItems(
         item.sourceResolution = try await BeauMediaOptimizableType.getDimensions(
           from: item.sourceURL
         )
+        item.updateTargetResolution(targetResolution)
       } catch {
         item.error = error.localizedDescription
       }
@@ -185,17 +186,15 @@ func processBeauMediaOptimizable(
       from: item.sourceURL
     )
     item.timeBegin = Date()
-    try await item.optimizeWithProgress { progress in
+    try await item.optimizeWithProgress(tempFileURL) { progress in
       item.completionPercentage = progress
     }
     item.targetSize = try getFileSize(at: tempFileURL)
-    if item.targetURL.path == item.sourceURL.path {
-      let isAbleToMoveSourceFileToTrash = try moveFileToTrashIfExists(
-        item.sourceURL
-      )
-      if !isAbleToMoveSourceFileToTrash {
-        throw BeauError.UnableToRemoveSourceFile()
-      }
+    let isAbleToMoveSourceFileToTrash = try moveFileToTrashIfExists(
+      item.sourceURL
+    )
+    if !isAbleToMoveSourceFileToTrash {
+      throw BeauError.UnableToRemoveSourceFile()
     }
     try FileManager.default.moveItem(
       at: tempFileURL,

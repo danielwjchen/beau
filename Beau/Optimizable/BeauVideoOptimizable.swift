@@ -25,7 +25,9 @@ class BeauVideoOptimizable: BeauMediaOptimizable {
     self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("mp4")
   }
 
-  func optimizeWithProgress(progressHandler: @escaping (Float) -> Void) async throws {
+  func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
+    async throws
+  {
     let asset = AVAsset(url: sourceURL)
     let presetName: String = AVAssetExportPreset1920x1080
 
@@ -39,10 +41,10 @@ class BeauVideoOptimizable: BeauMediaOptimizable {
     }
 
     exportSession.outputFileType = .mp4
-    exportSession.outputURL = targetURL
+    exportSession.outputURL = tempFileURL
 
     // Remove old file if it exists to avoid conflicts.
-    if FileManager.default.fileExists(atPath: targetURL.path) {
+    if FileManager.default.fileExists(atPath: tempFileURL.path) {
       throw BeauError.FileExists()
     }
 

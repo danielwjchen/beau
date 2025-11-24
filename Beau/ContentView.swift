@@ -50,6 +50,11 @@ struct ContentView: View {
         session.resolution = "\(selectedVideoPreset.width)x\(selectedVideoPreset.height)"
         session.encoding = selectedVideoPreset.encoding
         setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
+        session.items.forEach { item in
+          item.updateTargetResolution(
+            CGSize(width: selectedVideoPreset.width, height: selectedVideoPreset.height)
+          )
+        }
       }
 
       if let sourceURL = session.sourceURL {

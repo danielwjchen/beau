@@ -25,8 +25,9 @@ class BeauImageOptimizable: BeauMediaOptimizable {
     self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("jpg")
   }
 
-  func optimizeWithProgress(progressHandler: @escaping (Float) -> Void) async throws {
-    let maxDimension: CGFloat = 1600
+  func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
+    async throws
+  {
     let quality: CGFloat = 0.75
     progressHandler(0.0)
     guard let imageData = try? Data(contentsOf: sourceURL) else {
@@ -39,27 +40,12 @@ class BeauImageOptimizable: BeauMediaOptimizable {
 
     progressHandler(0.1)
 
-    let originalSize = image.size
-    let scale: CGFloat
-
-    if originalSize.width > maxDimension || originalSize.height > maxDimension {
-      let maxCurrentDimension = max(originalSize.width, originalSize.height)
-      scale = maxDimension / maxCurrentDimension
-    } else {
-      scale = 1.0
-    }
-
-    let newSize = NSSize(
-      width: originalSize.width * scale,
-      height: originalSize.height * scale
-    )
-
     // Resizing
-    let resizedImage = NSImage(size: newSize)
+    let resizedImage = NSImage(size: targetResolution ?? image.size)
     resizedImage.lockFocus()
     image.draw(
-      in: NSRect(origin: .zero, size: newSize),
-      from: NSRect(origin: .zero, size: originalSize),
+      in: NSRect(origin: .zero, size: targetResolution ?? image.size),
+      from: NSRect(origin: .zero, size: image.size),
       operation: .sourceOver,
       fraction: 1.0)
     resizedImage.unlockFocus()
@@ -83,10 +69,10 @@ class BeauImageOptimizable: BeauMediaOptimizable {
 
     progressHandler(0.7)
     do {
-      try jpegData.write(to: targetURL, options: .atomic)
+      try jpegData.write(to: tempFileURL, options: .atomic)
       progressHandler(1.0)
     } catch {
-      throw BeauError.UnknownExportError("Could not write to \(targetURL).")
+      throw BeauError.UnknownExportError("Could not write to \(tempFileURL).")
     }
   }
 
