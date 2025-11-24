@@ -260,7 +260,7 @@ func setBeauItemsIsSelectedByVideoPreset(
   })
 }
 
-func getBeauMediaOptimizableType(for url: URL) -> BeauMediaOptimizable.Type? {
+func getBeauMediaOptimizableType(for url: URL) -> (any BeauMediaOptimizable.Type)? {
   do {
     if let contentType = try url.resourceValues(forKeys: [.contentTypeKey]).contentType {
       if contentType.conforms(to: .movie) || contentType.conforms(to: .video) {
