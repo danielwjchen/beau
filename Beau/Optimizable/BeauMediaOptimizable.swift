@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 protocol BeauMediaOptimizable: ObservableObject, AnyObject {
@@ -11,6 +12,7 @@ protocol BeauMediaOptimizable: ObservableObject, AnyObject {
   var targetEncoding: String { get set }
   var sourceSize: Int64? { get set }
   var targetSize: Int64? { get set }
+  var thumbnail: CGImage? { get set }
 
   var error: String { get set }
   var completionPercentage: Float? { get set }

@@ -17,6 +17,7 @@ class BeauImageOptimizable: BeauMediaOptimizable {
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
   @Published var isSelected: Bool = true
+  @Published var thumbnail: CGImage?
 
   required init(
     sourceURL: URL

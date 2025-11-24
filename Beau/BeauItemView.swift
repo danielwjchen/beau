@@ -2,9 +2,7 @@ import SwiftUI
 
 struct BeauItemView<T: BeauMediaOptimizable>: View {
   @ObservedObject var item: T
-  @State private var thumbnail = Image(systemName: "video")
   let relativeURL: URL
-  let thumbnailSize: CGSize = CGSize(width: 100, height: 100)
 
   init(_ item: T, _ sourceURL: URL) {
     let urlString = item.sourceURL.path.replacingOccurrences(
@@ -22,8 +20,18 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
           .labelsHidden()
           .toggleStyle(.checkbox)
         HStack(alignment: .center, spacing: 2) {
-          self.thumbnail
-            .opacity(item.isSelected ? 1 : 0.5)
+          if let cgImage = item.thumbnail {
+            let nsImage = NSImage(cgImage: cgImage, size: .zero)
+            Image(nsImage: nsImage)
+              .resizable()
+              .scaledToFit()
+              .opacity(item.isSelected ? 1 : 0.5)
+          } else {
+            Image(systemName: "questionmark.square.dashed")
+              .resizable()
+              .scaledToFit()
+              .opacity(item.isSelected ? 1 : 0.5)
+          }
         }.frame(maxWidth: 100)
         VStack(alignment: .leading) {
           BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
@@ -52,17 +60,6 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
       if !item.error.isEmpty {
         Text(item.error)
           .foregroundColor(.red)
-      }
-    }
-    .task {
-      do {
-        let cgImage = try await generateThumbnail(
-          for: item.sourceURL, size: thumbnailSize
-        )
-        let nsImage = NSImage(cgImage: cgImage, size: .zero)
-        self.thumbnail = Image(nsImage: nsImage)
-      } catch {
-        item.error = "Thumbnail error: \(error.localizedDescription)"
       }
     }
   }

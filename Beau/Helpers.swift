@@ -67,7 +67,7 @@ func createBeauItems(
   _ fileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
   progressHandler: @escaping (Float, String) -> Void
 ) async -> [any BeauMediaOptimizable] {
-
+  let thumbnailSize: CGSize = CGSize(width: 100, height: 100)
   var result: [any BeauMediaOptimizable] = []
   progressHandler(0, "Loading files")
   for (index, fileURL) in fileURLs.enumerated() {
@@ -86,6 +86,12 @@ func createBeauItems(
           from: item.sourceURL
         )
         item.updateTargetResolution(targetResolution)
+        progressHandler(
+          progressPercentage, "\(item.sourceURL.lastPathComponent): Generating thumbnail"
+        )
+        item.thumbnail = try await generateThumbnail(
+          for: item.sourceURL, size: thumbnailSize
+        )
       } catch {
         item.error = error.localizedDescription
       }
