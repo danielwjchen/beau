@@ -182,7 +182,7 @@ func processBeauMediaOptimizable(
     }
     item.completionPercentage = 0
     let tempFileURL = try getTempFileURL(
-      from: item.sourceURL, pattern: tempFileNamePattern
+      from: item.sourceURL
     )
     item.timeBegin = Date()
     try await item.optimizeWithProgress { progress in
