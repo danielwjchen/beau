@@ -72,7 +72,7 @@ func createBeauMediaOptimizable(
   progressHandler(0, "Loading files")
   for (index, fileURL) in fileURLs.enumerated() {
     let itemNumber = index + 1
-    let progressPercentage = Float(itemNumber / fileURLs.count)
+    let progressPercentage = Float(itemNumber) / Float(fileURLs.count)
     let progressMessage = "\(itemNumber)/\(fileURLs.count)"
     progressHandler(progressPercentage, "\(progressMessage) \(fileURL.lastPathComponent) is found")
     if let BeauMediaOptimizableType = getBeauMediaOptimizableType(for: fileURL) {
