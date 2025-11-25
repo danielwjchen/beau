@@ -63,7 +63,7 @@ func getFileSize(at url: URL) throws -> Int64? {
   return attributes[.size] as? Int64
 }
 
-func createBeauItems(
+func createBeauMediaOptimizable(
   _ fileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
   progressHandler: @escaping (Float, String) -> Void
 ) async -> [any BeauMediaOptimizable] {
@@ -72,7 +72,7 @@ func createBeauItems(
   progressHandler(0, "Loading files")
   for (index, fileURL) in fileURLs.enumerated() {
     let itemNumber = index + 1
-    let progressPercentage = Float((itemNumber) / fileURLs.count)
+    let progressPercentage = Float(itemNumber / fileURLs.count)
     let progressMessage = "\(itemNumber)/\(fileURLs.count)"
     progressHandler(progressPercentage, "\(progressMessage) \(fileURL.lastPathComponent) is found")
     if let BeauMediaOptimizableType = getBeauMediaOptimizableType(for: fileURL) {

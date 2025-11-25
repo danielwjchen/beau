@@ -112,7 +112,7 @@ struct ContentView: View {
               let targetResolution = CGSize(width: 1920, height: 1080)
               let targetEncoding = ""
               Task {
-                session.items = await createBeauItems(
+                session.items = await createBeauMediaOptimizable(
                   fileURLs, targetResolution, targetEncoding
                 ) { progressPercentage, message in
                   self.itemProgressPercentage = progressPercentage
