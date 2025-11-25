@@ -47,4 +47,24 @@ class BeauSession: ObservableObject {
     self.timeBegin = timeBegin
     self.timeEnd = timeEnd
   }
+
+  init(from preset: TargetPreset) {
+    self.isInPlace = true
+    self.resolution = getResolutionFromTargetPreset(preset)
+    self.encoding = preset.encoding
+    self.renamePattern = ""
+    self.tempFileNamePattern = ".tmp"
+    self.preservesMeta = true
+    self.sourceURL = nil
+    self.targetURL = nil
+    self.preservesFolders = true
+    self.items = []
+    self.timeBegin = nil
+    self.timeEnd = nil
+  }
+
+  public func setPropertiesFromPreset(_ preset: TargetPreset) {
+    self.resolution = "\(preset.width)x\(preset.height)"
+    self.encoding = preset.encoding
+  }
 }

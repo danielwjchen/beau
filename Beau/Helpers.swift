@@ -217,43 +217,48 @@ func processBeauMediaOptimizable(
   item.timeEnd = Date()
 }
 
-struct VideoPreset: Identifiable, Hashable {
-  let id: String
+struct TargetPreset: Identifiable, Hashable {
+  var id: String { label }
+  let videoPreset: String
   let label: String
   let width: CGFloat
   let height: CGFloat
   let encoding: String
 
-  static let defaultValue: VideoPreset = .init(
-    id: AVAssetExportPreset1920x1080,
+  static let defaultValue: TargetPreset = .init(
+    videoPreset: AVAssetExportPreset1920x1080,
     label: "Full HD (1080p)",
     width: 1920,
     height: 1080,
     encoding: "avc"
   )
 
-  static let all: [VideoPreset] = [
+  static let all: [TargetPreset] = [
     .init(
-      id: AVAssetExportPreset3840x2160, label: "4K (2160p)", width: 3840, height: 2160,
+      videoPreset: AVAssetExportPreset3840x2160, label: "4K (2160p)", width: 3840, height: 2160,
       encoding: "avc"),
     defaultValue,
     .init(
-      id: AVAssetExportPreset1280x720, label: "HD (720p)", width: 1280, height: 720,
+      videoPreset: AVAssetExportPreset1280x720, label: "HD (720p)", width: 1280, height: 720,
       encoding: "avc"),
     .init(
-      id: AVAssetExportPreset960x540, label: "qHD (540p)", width: 960, height: 540,
+      videoPreset: AVAssetExportPreset960x540, label: "qHD (540p)", width: 960, height: 540,
       encoding: "avc"),
     .init(
-      id: AVAssetExportPreset640x480, label: "SD (480p)", width: 640, height: 480,
+      videoPreset: AVAssetExportPreset640x480, label: "SD (480p)", width: 640, height: 480,
       encoding: "avc"),
     .init(
-      id: AVAssetExportPresetLowQuality, label: "Low Quality (360p)", width: 480,
+      videoPreset: AVAssetExportPresetLowQuality, label: "Low Quality (360p)", width: 480,
       height: 360, encoding: "avc"),
   ]
 }
 
+func getResolutionFromTargetPreset(_ preset: TargetPreset) -> String {
+  return "\(preset.width)x\(preset.height)"
+}
+
 func setBeauItemsIsSelectedByVideoPreset(
-  _ items: [any BeauMediaOptimizable], _ videoPreset: VideoPreset
+  _ items: [any BeauMediaOptimizable], _ videoPreset: TargetPreset
 ) {
   items.forEach({ item in
     if let width = item.sourceResolution?.width,

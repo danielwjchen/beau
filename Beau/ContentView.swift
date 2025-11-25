@@ -17,14 +17,11 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
 
-  @StateObject private var session: BeauSession = BeauSession(
-    resolution: "4k",
-    encoding: "HEVC",
-  )
+  @StateObject private var session = BeauSession(from: TargetPreset.defaultValue)
 
   @State private var isImporterPresented: Bool = false
   @State private var isReady: Bool = false
-  @State private var selectedVideoPreset: VideoPreset = .defaultValue
+  @State private var selectedTargetPreset: TargetPreset = .defaultValue
   @State private var isAccessing: Bool = false
   @State public var itemProgressPercentage: Float? = nil
   @State public var itemProgressMessage: String = ""
@@ -39,20 +36,19 @@ struct ContentView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Picker("Target", selection: $selectedVideoPreset) {
-        ForEach(VideoPreset.all) { preset in
+      Picker("Target", selection: $selectedTargetPreset) {
+        ForEach(TargetPreset.all) { preset in
           Text(preset.label).tag(preset)
         }
       }
       .padding(.vertical, 8.0)
       .padding(.horizontal, 8.0)
-      .onChange(of: selectedVideoPreset) {
-        session.resolution = "\(selectedVideoPreset.width)x\(selectedVideoPreset.height)"
-        session.encoding = selectedVideoPreset.encoding
-        setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
+      .onChange(of: selectedTargetPreset) {
+        session.setPropertiesFromPreset(selectedTargetPreset)
+        setBeauItemsIsSelectedByVideoPreset(session.items, selectedTargetPreset)
         session.items.forEach { item in
           item.updateTargetResolution(
-            CGSize(width: selectedVideoPreset.width, height: selectedVideoPreset.height)
+            CGSize(width: selectedTargetPreset.width, height: selectedTargetPreset.height)
           )
         }
       }
@@ -122,7 +118,7 @@ struct ContentView: View {
                   self.itemProgressPercentage = progressPercentage
                   self.itemProgressMessage = message
                 }
-                setBeauItemsIsSelectedByVideoPreset(session.items, selectedVideoPreset)
+                setBeauItemsIsSelectedByVideoPreset(session.items, selectedTargetPreset)
                 isReady = session.items.count > 0
               }
             }
