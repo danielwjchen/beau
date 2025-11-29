@@ -38,27 +38,24 @@ class BeauImageOptimizable: BeauMediaOptimizable {
       throw BeauError.UnknownExportError("Could not load file from source URL.")
     }
 
-    // Create an image source so we can read metadata
     guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil) else {
       throw BeauError.UnknownExportError("Could not create image source.")
     }
 
-    // Grab original metadata (EXIF, TIFF, GPS, etc.)
     let originalMetadata =
       CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any] ?? [:]
 
-    // Create a CGImage from the source for drawing/resizing
     guard let originalCGImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
       throw BeauError.UnknownExportError("Could not create CGImage from source.")
     }
 
     progressHandler(0.1)
 
-    // Prepare target size
-    let pixelWidth = max(1, Int(round(targetResolution!.width)))
-    let pixelHeight = max(1, Int(round(targetResolution!.height)))
+    let targetSize =
+      targetResolution ?? CGSize(width: originalCGImage.width, height: originalCGImage.height)
+    let pixelWidth = max(1, Int(round(targetSize.width)))
+    let pixelHeight = max(1, Int(round(targetSize.height)))
 
-    // Create a bitmap context to draw the resized image
     guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else {
       throw BeauError.UnknownExportError("Could not create color space.")
     }
@@ -78,13 +75,16 @@ class BeauImageOptimizable: BeauMediaOptimizable {
     }
 
     context.interpolationQuality = .high
-
-    // Flip coordinate system for correct drawing if needed
     context.saveGState()
-    context.translateBy(x: 0, y: CGFloat(pixelHeight))
-    context.scaleBy(x: 1.0, y: -1.0)
 
-    let drawRect = CGRect(x: 0, y: 0, width: CGFloat(pixelWidth), height: CGFloat(pixelHeight))
+    // Scale the image to fit target dimensions
+    let sx = CGFloat(pixelWidth) / CGFloat(originalCGImage.width)
+    let sy = CGFloat(pixelHeight) / CGFloat(originalCGImage.height)
+    context.scaleBy(x: sx, y: sy)
+
+    // Draw image naturally without flipping
+    let drawRect = CGRect(
+      x: 0, y: 0, width: CGFloat(originalCGImage.width), height: CGFloat(originalCGImage.height))
     context.draw(originalCGImage, in: drawRect)
     context.restoreGState()
 
@@ -94,11 +94,9 @@ class BeauImageOptimizable: BeauMediaOptimizable {
 
     progressHandler(0.4)
 
-    // Prepare metadata for destination, merging original metadata and compression quality
     var destinationMetadata = originalMetadata
     destinationMetadata[kCGImageDestinationLossyCompressionQuality] = quality as CFNumber
 
-    // Create image destination and write the resized image along with metadata
     guard
       let destination = CGImageDestinationCreateWithURL(
         tempFileURL as CFURL,
