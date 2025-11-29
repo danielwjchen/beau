@@ -17,8 +17,8 @@ class BeauSession: ObservableObject {
   var targetURL: URL?
   var preservesFolders: Bool
   @Published var items: [any BeauMediaOptimizable] = []
-  var timeBegin: Date?
-  var timeEnd: Date?
+  @Published var timeBegin: Date?
+  @Published var timeEnd: Date?
 
   init(
     isInPlace: Bool = true,
