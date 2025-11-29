@@ -1,5 +1,7 @@
 import AppKit
 import Foundation
+import ImageIO
+import UniformTypeIdentifiers
 
 class BeauImageOptimizable: BeauMediaOptimizable {
 
@@ -35,71 +37,90 @@ class BeauImageOptimizable: BeauMediaOptimizable {
     guard let imageData = try? Data(contentsOf: sourceURL) else {
       throw BeauError.UnknownExportError("Could not load file from source URL.")
     }
-    guard let image = NSImage(data: imageData) else {
-      throw BeauError.UnknownExportError("Could not load image from source URL.")
+
+    // Create an image source so we can read metadata
+    guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil) else {
+      throw BeauError.UnknownExportError("Could not create image source.")
     }
-    let originalSize = image.size
+
+    // Grab original metadata (EXIF, TIFF, GPS, etc.)
+    let originalMetadata =
+      CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any] ?? [:]
+
+    // Create a CGImage from the source for drawing/resizing
+    guard let originalCGImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
+      throw BeauError.UnknownExportError("Could not create CGImage from source.")
+    }
+
     progressHandler(0.1)
 
-    // Use an explicit bitmap-backed NSBitmapImageRep at the desired pixel size
-    let targetSize = targetResolution ?? image.size
+    // Prepare target size
+    let targetSize =
+      targetResolution ?? CGSize(width: originalCGImage.width, height: originalCGImage.height)
     let pixelWidth = max(1, Int(round(targetSize.width)))
     let pixelHeight = max(1, Int(round(targetSize.height)))
 
+    // Create a bitmap context to draw the resized image
+    guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else {
+      throw BeauError.UnknownExportError("Could not create color space.")
+    }
+
     guard
-      let bitmapRep = NSBitmapImageRep(
-        bitmapDataPlanes: nil,
-        pixelsWide: pixelWidth,
-        pixelsHigh: pixelHeight,
-        bitsPerSample: 8,
-        samplesPerPixel: 4,
-        hasAlpha: true,
-        isPlanar: false,
-        colorSpaceName: NSColorSpaceName.deviceRGB,
+      let context = CGContext(
+        data: nil,
+        width: pixelWidth,
+        height: pixelHeight,
+        bitsPerComponent: 8,
         bytesPerRow: 0,
-        bitsPerPixel: 0
+        space: colorSpace,
+        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
       )
     else {
-      throw BeauError.UnknownExportError("Could not create bitmap representation.")
-    }
-
-    // Draw the source image into the bitmap rep at the requested pixel size.
-    NSGraphicsContext.saveGraphicsState()
-    guard let context = NSGraphicsContext(bitmapImageRep: bitmapRep) else {
-      NSGraphicsContext.restoreGraphicsState()
       throw BeauError.UnknownExportError("Could not create graphics context for resizing.")
     }
-    NSGraphicsContext.current = context
-    context.cgContext.interpolationQuality = .high
 
-    let drawRect = NSRect(x: 0, y: 0, width: CGFloat(pixelWidth), height: CGFloat(pixelHeight))
-    image.draw(
-      in: drawRect,
-      from: NSRect(origin: .zero, size: originalSize),
-      operation: .copy,
-      fraction: 1.0,
-      respectFlipped: true,
-      hints: nil
-    )
-    NSGraphicsContext.restoreGraphicsState()
+    context.interpolationQuality = .high
+
+    // Flip coordinate system for correct drawing if needed
+    context.saveGState()
+    context.translateBy(x: 0, y: CGFloat(pixelHeight))
+    context.scaleBy(x: 1.0, y: -1.0)
+
+    let drawRect = CGRect(x: 0, y: 0, width: CGFloat(pixelWidth), height: CGFloat(pixelHeight))
+    context.draw(originalCGImage, in: drawRect)
+    context.restoreGState()
+
+    guard let resizedCGImage = context.makeImage() else {
+      throw BeauError.UnknownExportError("Could not create resized CGImage.")
+    }
 
     progressHandler(0.4)
 
-    let properties: [NSBitmapImageRep.PropertyKey: Any] = [
-      .compressionFactor: quality
-    ]
+    // Prepare metadata for destination, merging original metadata and compression quality
+    var destinationMetadata = originalMetadata
+    destinationMetadata[kCGImageDestinationLossyCompressionQuality] = quality as CFNumber
 
-    guard let jpegData = bitmapRep.representation(using: .jpeg, properties: properties) else {
-      throw BeauError.UnknownExportError("Could not convert jpeg data from source URL.")
+    // Create image destination and write the resized image along with metadata
+    guard
+      let destination = CGImageDestinationCreateWithURL(
+        tempFileURL as CFURL,
+        UTType.jpeg.identifier as CFString,
+        1,
+        nil
+      )
+    else {
+      throw BeauError.UnknownExportError("Could not create image destination.")
     }
+
+    CGImageDestinationAddImage(destination, resizedCGImage, destinationMetadata as CFDictionary)
 
     progressHandler(0.7)
-    do {
-      try jpegData.write(to: tempFileURL, options: .atomic)
-      progressHandler(1.0)
-    } catch {
-      throw BeauError.UnknownExportError("Could not write to \(tempFileURL).")
+
+    if !CGImageDestinationFinalize(destination) {
+      throw BeauError.UnknownExportError("Failed to write optimized image with metadata.")
     }
+
+    progressHandler(1.0)
   }
 
   class func getDimensions(from url: URL) async throws -> CGSize {
