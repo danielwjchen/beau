@@ -55,10 +55,8 @@ class BeauImageOptimizable: BeauMediaOptimizable {
     progressHandler(0.1)
 
     // Prepare target size
-    let targetSize =
-      targetResolution ?? CGSize(width: originalCGImage.width, height: originalCGImage.height)
-    let pixelWidth = max(1, Int(round(targetSize.width)))
-    let pixelHeight = max(1, Int(round(targetSize.height)))
+    let pixelWidth = max(1, Int(round(targetResolution!.width)))
+    let pixelHeight = max(1, Int(round(targetResolution!.height)))
 
     // Create a bitmap context to draw the resized image
     guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else {
