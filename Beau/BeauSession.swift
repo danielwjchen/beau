@@ -1,9 +1,3 @@
-//
-//  Models.swift
-//  Beau
-//
-//  Created by Daniel Chen on 10/20/25.
-//
 import Foundation
 
 class BeauSession: ObservableObject {
