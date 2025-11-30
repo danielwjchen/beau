@@ -48,4 +48,5 @@ struct BeauBreadcrumbPathView: View {
 
 #Preview {
   BeauBreadcrumbPathView(url: URL(string: "/home/foobar/Documents/Secrets/config.json")!)
+        .padding(10)
 }

@@ -16,9 +16,17 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack(alignment: .center) {
-        Toggle("Is Selected", isOn: $item.isSelected)
-          .labelsHidden()
-          .toggleStyle(.checkbox)
+        if item.error != "" {
+          Image(systemName: "exclamationmark.triangle.fill")
+            .foregroundColor(.red)
+        } else if item.timeEnd != nil {
+          Image(systemName: "checkmark.seal.fill")
+            .foregroundColor(.green)
+        } else {
+          Toggle("Is Selected", isOn: $item.isSelected)
+            .labelsHidden()
+            .toggleStyle(.checkbox)
+        }
         HStack(alignment: .center, spacing: 2) {
           if let cgImage = item.thumbnail {
             let nsImage = NSImage(cgImage: cgImage, size: .zero)
@@ -75,5 +83,33 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
   // item.sourceEncoding = "hevc"
   // item.sourceSize = 123456
   BeauItemView(item, URL(string: "/home/foobar/Documents")!)
+    .padding(10)
+}
+
+#Preview("Is completed") {
+  var item = BeauVideoOptimizable(
+    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
+  )
+  item.timeEnd = Date()
+  // item.targetResolution = CGSize(width: 1920, height: 1080)
+  // item.targetEncoding = "avc"
+  // item.sourceResolution = CGSize(width: 3840, height: 2160)
+  // item.sourceEncoding = "hevc"
+  // item.sourceSize = 123456
+  return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
+    .padding(10)
+}
+
+#Preview("Has errors") {
+  var item = BeauVideoOptimizable(
+    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
+  )
+  item.error = "Placeholder error"
+  // item.targetResolution = CGSize(width: 1920, height: 1080)
+  // item.targetEncoding = "avc"
+  // item.sourceResolution = CGSize(width: 3840, height: 2160)
+  // item.sourceEncoding = "hevc"
+  // item.sourceSize = 123456
+  return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
     .padding(10)
 }
