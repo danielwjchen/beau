@@ -77,25 +77,27 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
   let item = BeauVideoOptimizable(
     sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
   )
-  // item.targetResolution = CGSize(width: 1920, height: 1080)
-  // item.targetEncoding = "avc"
-  // item.sourceResolution = CGSize(width: 3840, height: 2160)
-  // item.sourceEncoding = "hevc"
-  // item.sourceSize = 123456
-  BeauItemView(item, URL(string: "/home/foobar/Documents")!)
+  item.targetResolution = CGSize(width: 1920, height: 1080)
+  item.targetEncoding = "avc"
+  item.sourceResolution = CGSize(width: 3840, height: 2160)
+  item.sourceEncoding = "hevc"
+  item.sourceSize = 98765
+  item.targetSize = 12345
+  return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
     .padding(10)
 }
 
-#Preview("Is completed") {
+#Preview("Is successful") {
   var item = BeauVideoOptimizable(
     sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
   )
   item.timeEnd = Date()
-  // item.targetResolution = CGSize(width: 1920, height: 1080)
-  // item.targetEncoding = "avc"
-  // item.sourceResolution = CGSize(width: 3840, height: 2160)
-  // item.sourceEncoding = "hevc"
-  // item.sourceSize = 123456
+  item.targetResolution = CGSize(width: 1920, height: 1080)
+  item.targetEncoding = "avc"
+  item.sourceResolution = CGSize(width: 3840, height: 2160)
+  item.sourceEncoding = "hevc"
+  item.sourceSize = 98765
+  item.targetSize = 12345
   return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
     .padding(10)
 }
@@ -104,12 +106,13 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
   var item = BeauVideoOptimizable(
     sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
   )
+  item.timeEnd = Date()
   item.error = "Placeholder error"
-  // item.targetResolution = CGSize(width: 1920, height: 1080)
-  // item.targetEncoding = "avc"
-  // item.sourceResolution = CGSize(width: 3840, height: 2160)
-  // item.sourceEncoding = "hevc"
-  // item.sourceSize = 123456
+  item.targetResolution = CGSize(width: 1920, height: 1080)
+  item.targetEncoding = "avc"
+  item.sourceResolution = CGSize(width: 3840, height: 2160)
+  item.sourceEncoding = "hevc"
+  item.sourceSize = 123456
   return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
     .padding(10)
 }
