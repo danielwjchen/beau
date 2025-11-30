@@ -1,7 +1,6 @@
 import Foundation
 
 class BeauSession: ObservableObject {
-  var isInPlace: Bool
   var resolution: String
   var encoding: String
   var renamePattern: String
@@ -15,7 +14,6 @@ class BeauSession: ObservableObject {
   @Published var timeEnd: Date?
 
   init(
-    isInPlace: Bool = true,
     resolution: String,
     encoding: String,
     renamePattern: String = "",
@@ -28,7 +26,6 @@ class BeauSession: ObservableObject {
     timeBegin: Date? = nil,
     timeEnd: Date? = nil
   ) {
-    self.isInPlace = isInPlace
     self.resolution = resolution
     self.encoding = encoding
     self.renamePattern = renamePattern
@@ -43,7 +40,6 @@ class BeauSession: ObservableObject {
   }
 
   init(from preset: TargetPreset) {
-    self.isInPlace = true
     self.resolution = getResolutionFromTargetPreset(preset)
     self.encoding = preset.encoding
     self.renamePattern = ""
