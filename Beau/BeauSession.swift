@@ -9,7 +9,7 @@ class BeauSession: ObservableObject {
   var sourceURL: URL?
   var targetURL: URL?
   var preservesFolders: Bool
-  @Published var items: [any BeauMediaOptimizable] = []
+  @Published var items: [any BeauOptimizable] = []
   @Published var timeBegin: Date?
   @Published var timeEnd: Date?
 
@@ -22,7 +22,7 @@ class BeauSession: ObservableObject {
     sourceURL: URL? = nil,
     targetURL: URL? = nil,
     preservesFolders: Bool = true,
-    items: [any BeauMediaOptimizable] = [],
+    items: [any BeauOptimizable] = [],
     timeBegin: Date? = nil,
     timeEnd: Date? = nil
   ) {

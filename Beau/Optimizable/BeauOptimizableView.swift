@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BeauItemView<T: BeauMediaOptimizable>: View {
+struct BeauItemView<T: BeauOptimizable>: View {
   @ObservedObject var item: T
   let relativeURL: URL
 

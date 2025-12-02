@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 
-protocol BeauMediaOptimizable: ObservableObject, AnyObject {
+protocol BeauOptimizable: ObservableObject, AnyObject {
   var timeBegin: Date? { get set }
   var timeEnd: Date? { get set }
   var sourceURL: URL { get set }
@@ -24,7 +24,7 @@ protocol BeauMediaOptimizable: ObservableObject, AnyObject {
   static func getDimensions(from url: URL) async throws -> CGSize
 }
 
-extension BeauMediaOptimizable {
+extension BeauOptimizable {
   func updateTargetResolution(_ targetResolution: CGSize) {
     let maxTargetDimension = max(targetResolution.width, targetResolution.height)
     let maxSourceDimension = max(sourceResolution?.width ?? 0, sourceResolution?.height ?? 0)

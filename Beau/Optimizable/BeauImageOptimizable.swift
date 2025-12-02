@@ -3,7 +3,7 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
-class BeauImageOptimizable: BeauMediaOptimizable {
+class BeauImageOptimizable: BeauOptimizable {
 
   var sourceURL: URL
   var targetURL: URL

@@ -66,9 +66,9 @@ func getFileSize(at url: URL) throws -> Int64? {
 func createBeauMediaOptimizable(
   _ fileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
   progressHandler: @escaping (Float, String) -> Void
-) async -> [any BeauMediaOptimizable] {
+) async -> [any BeauOptimizable] {
   let thumbnailSize: CGSize = CGSize(width: 100, height: 100)
-  var result: [any BeauMediaOptimizable] = []
+  var result: [any BeauOptimizable] = []
   progressHandler(0, "Loading files")
   for (index, fileURL) in fileURLs.enumerated() {
     let itemNumber = index + 1
@@ -186,7 +186,7 @@ func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
 }
 
 func processBeauMediaOptimizable(
-  _ item: any BeauMediaOptimizable, _ tempFileNamePattern: String
+  _ item: any BeauOptimizable, _ tempFileNamePattern: String
 ) async {
   do {
     if !item.isSelected {
@@ -258,7 +258,7 @@ func getResolutionFromTargetPreset(_ preset: TargetPreset) -> String {
 }
 
 func setBeauItemsIsSelectedByVideoPreset(
-  _ items: [any BeauMediaOptimizable], _ videoPreset: TargetPreset
+  _ items: [any BeauOptimizable], _ videoPreset: TargetPreset
 ) {
   items.forEach({ item in
     if let width = item.sourceResolution?.width,
@@ -275,7 +275,7 @@ func setBeauItemsIsSelectedByVideoPreset(
   })
 }
 
-func getBeauMediaOptimizableType(for url: URL) -> (any BeauMediaOptimizable.Type)? {
+func getBeauMediaOptimizableType(for url: URL) -> (any BeauOptimizable.Type)? {
   do {
     if let contentType = try url.resourceValues(forKeys: [.contentTypeKey]).contentType {
       if contentType.conforms(to: .movie) || contentType.conforms(to: .video) {

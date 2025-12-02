@@ -1,7 +1,7 @@
 import AVFoundation
 import Foundation
 
-class BeauVideoOptimizable: BeauMediaOptimizable {
+class BeauVideoOptimizable: BeauOptimizable {
 
   var sourceURL: URL
   var targetURL: URL
