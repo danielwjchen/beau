@@ -56,4 +56,5 @@ struct BeauNameAndSizeView: View {
     resolution: CGSize(width: 1920, height: 1080),
     fileSize: 123456
   )
+  .padding(10)
 }
