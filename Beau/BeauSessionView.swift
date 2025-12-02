@@ -32,49 +32,9 @@ struct BeauSessionView: View {
 }
 
 #Preview("Empty Session") {
-  BeauSessionView(
-    BeauSession(
-      from: TargetPreset.defaultValue
-    )
-  )
+  BeauSessionView(BeauPreviewMocks.getSessionEmpty())
 }
 
 #Preview("With Items") {
-  let session = BeauSession(from: TargetPreset.defaultValue)
-  session.sourceURL = URL(string: "/Users/foobar/Videos")!
-
-  // Create sample video item
-  let videoItem = BeauVideoOptimizable(
-    sourceURL: URL(string: "/Users/foobar/Videos/sample_4k.mov")!
-  )
-  videoItem.sourceResolution = CGSize(width: 3840, height: 2160)
-  videoItem.sourceSize = 5_000_000_000
-  videoItem.targetResolution = CGSize(width: 1920, height: 1080)
-  videoItem.targetSize = 1_200_000_000
-  videoItem.isSelected = true
-  videoItem.completionPercentage = 0.65
-
-  // Create sample image item
-  let imageItem = BeauImageOptimizable(
-    sourceURL: URL(string: "/Users/foobar/Pictures/photo_large.png")!
-  )
-  imageItem.sourceResolution = CGSize(width: 4000, height: 3000)
-  imageItem.sourceSize = 30_000_000
-  imageItem.targetResolution = CGSize(width: 1920, height: 1440)
-  imageItem.targetSize = 2_500_000
-  imageItem.isSelected = true
-  imageItem.timeEnd = Date()
-
-  // Create completed item with error
-  let errorItem = BeauVideoOptimizable(
-    sourceURL: URL(string: "/Users/foobar/Videos/corrupted.mov")!
-  )
-  errorItem.sourceResolution = CGSize(width: 2560, height: 1440)
-  errorItem.sourceSize = 2_000_000_000
-  errorItem.error = "Unable to load video track"
-  errorItem.isSelected = false
-
-  session.items = [videoItem, imageItem, errorItem]
-
-  return BeauSessionView(session)
+  BeauSessionView(BeauPreviewMocks.getSessionWithItems())
 }

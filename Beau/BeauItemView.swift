@@ -27,36 +27,40 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
             .labelsHidden()
             .toggleStyle(.checkbox)
         }
-        HStack(alignment: .center, spacing: 2) {
-          if let cgImage = item.thumbnail {
-            let nsImage = NSImage(cgImage: cgImage, size: .zero)
-            Image(nsImage: nsImage)
-              .resizable()
-              .scaledToFit()
-              .opacity(item.isSelected ? 1 : 0.5)
-          } else {
-            Image(systemName: "questionmark.square.dashed")
-              .resizable()
-              .scaledToFit()
-              .opacity(item.isSelected ? 1 : 0.5)
+        HStack(alignment: .top, spacing: 2) {
+          VStack {
+            if let cgImage = item.thumbnail {
+              let nsImage = NSImage(cgImage: cgImage, size: .zero)
+              Image(nsImage: nsImage)
+                .resizable()
+                .scaledToFit()
+                .opacity(item.isSelected ? 1 : 0.5).frame(maxWidth: 100)
+            } else {
+              Image(systemName: "questionmark.square.dashed")
+                .resizable()
+                .scaledToFit()
+                .opacity(item.isSelected ? 1 : 0.5).frame(maxWidth: 100)
+            }
           }
-        }.frame(maxWidth: 100)
-        VStack(alignment: .leading) {
-          BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
-            .padding(.bottom, 4)
-          HStack(alignment: .center) {
-            BeauNameAndSizeView(
-              name: item.sourceURL.lastPathComponent,
-              resolution: item.sourceResolution,
-              fileSize: item.sourceSize
-            )
+          .frame(width: 100, height: 100)
+          VStack(alignment: .leading) {
+            BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
+              .padding(10)
             Spacer()
-            BeauNameAndSizeView(
-              name: item.targetURL.lastPathComponent,
-              resolution: item.targetResolution,
-              fileSize: item.targetSize
-            )
-          }
+            HStack(alignment: .bottom) {
+              BeauNameAndSizeView(
+                name: item.sourceURL.lastPathComponent,
+                resolution: item.sourceResolution,
+                fileSize: item.sourceSize
+              )
+              Spacer()
+              BeauNameAndSizeView(
+                name: item.targetURL.lastPathComponent,
+                resolution: item.targetResolution,
+                fileSize: item.targetSize
+              )
+            }
+          }.frame(maxHeight: 100)
         }
       }
       ProgressView(value: item.completionPercentage)
@@ -73,46 +77,26 @@ struct BeauItemView<T: BeauMediaOptimizable>: View {
   }
 }
 
-#Preview {
-  let item = BeauVideoOptimizable(
-    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
+#Preview("Is selected") {
+  BeauItemView(
+    BeauPreviewMocks.getVideoOptimizableIsSelected(),
+    BeauPreviewMocks.folderURL
   )
-  item.targetResolution = CGSize(width: 1920, height: 1080)
-  item.targetEncoding = "avc"
-  item.sourceResolution = CGSize(width: 3840, height: 2160)
-  item.sourceEncoding = "hevc"
-  item.sourceSize = 98765
-  item.targetSize = 12345
-  return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
-    .padding(10)
+  .padding(10)
 }
 
 #Preview("Is successful") {
-  var item = BeauVideoOptimizable(
-    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
+  BeauItemView(
+    BeauPreviewMocks.getImageOptimizableSuccessful(),
+    BeauPreviewMocks.folderURL
   )
-  item.timeEnd = Date()
-  item.targetResolution = CGSize(width: 1920, height: 1080)
-  item.targetEncoding = "avc"
-  item.sourceResolution = CGSize(width: 3840, height: 2160)
-  item.sourceEncoding = "hevc"
-  item.sourceSize = 98765
-  item.targetSize = 12345
-  return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
-    .padding(10)
+  .padding(10)
 }
 
 #Preview("Has errors") {
-  var item = BeauVideoOptimizable(
-    sourceURL: URL(string: "/home/foobar/Documents/sample.mov")!
+  BeauItemView(
+    BeauPreviewMocks.getImageOptimizableWithError(),
+    BeauPreviewMocks.folderURL
   )
-  item.timeEnd = Date()
-  item.error = "Placeholder error"
-  item.targetResolution = CGSize(width: 1920, height: 1080)
-  item.targetEncoding = "avc"
-  item.sourceResolution = CGSize(width: 3840, height: 2160)
-  item.sourceEncoding = "hevc"
-  item.sourceSize = 123456
-  return BeauItemView(item, URL(string: "/home/foobar/Documents")!)
-    .padding(10)
+  .padding(10)
 }
