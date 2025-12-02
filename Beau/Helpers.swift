@@ -167,6 +167,7 @@ func generateThumbnail(for url: URL, size: CGSize) async throws -> CGImage {
   }
 }
 
+@discardableResult
 func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
   let fileManager = FileManager.default
 
@@ -188,29 +189,33 @@ func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
 func processBeauMediaOptimizable(
   _ item: any BeauOptimizable, _ tempFileNamePattern: String
 ) async {
+  if !item.isSelected {
+    return
+  }
+  item.completionPercentage = 0
   do {
-    if !item.isSelected {
-      return
+    let tempFileURL = try getTempFileURL(from: item.sourceURL)
+    do {
+
+      item.timeBegin = Date()
+      try await item.optimizeWithProgress(tempFileURL) { progress in
+        item.completionPercentage = progress
+      }
+      item.targetSize = try getFileSize(at: tempFileURL)
+      let isAbleToMoveSourceFileToTrash = try moveFileToTrashIfExists(
+        item.sourceURL
+      )
+      if !isAbleToMoveSourceFileToTrash {
+        throw BeauError.UnableToRemoveSourceFile()
+      }
+      try FileManager.default.moveItem(
+        at: tempFileURL,
+        to: item.targetURL
+      )
+    } catch {
+      item.error = error.localizedDescription
+      try moveFileToTrashIfExists(tempFileURL)
     }
-    item.completionPercentage = 0
-    let tempFileURL = try getTempFileURL(
-      from: item.sourceURL
-    )
-    item.timeBegin = Date()
-    try await item.optimizeWithProgress(tempFileURL) { progress in
-      item.completionPercentage = progress
-    }
-    item.targetSize = try getFileSize(at: tempFileURL)
-    let isAbleToMoveSourceFileToTrash = try moveFileToTrashIfExists(
-      item.sourceURL
-    )
-    if !isAbleToMoveSourceFileToTrash {
-      throw BeauError.UnableToRemoveSourceFile()
-    }
-    try FileManager.default.moveItem(
-      at: tempFileURL,
-      to: item.targetURL
-    )
   } catch {
     item.error = error.localizedDescription
   }
