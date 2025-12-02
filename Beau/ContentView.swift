@@ -53,25 +53,7 @@ struct ContentView: View {
         }
       }
 
-      if let sourceURL = session.sourceURL {
-        BeauBreadcrumbPathView(url: sourceURL)
-          .padding(8)
-        List(session.items, id: \.sourceURL) { item in
-          // Type erasure to determine the concrete type of BeauMediaOptimizable
-          // this is necessary because a problem with Swift's language design
-          if item is BeauVideoOptimizable {
-            if let videoItem = item as? BeauVideoOptimizable {
-              BeauItemView(videoItem, sourceURL)
-            }
-          } else if item is BeauImageOptimizable {
-            if let imageItem = item as? BeauImageOptimizable {
-              BeauItemView(imageItem, sourceURL)
-            }
-          }
-        }
-      } else {
-        Spacer()
-      }
+      BeauSessionView(session)
       if session.sourceURL != nil && session.items.count == 0 {
         BeauLoadingView(itemProgressMessage)
           .font(.caption)
