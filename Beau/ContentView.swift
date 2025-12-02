@@ -17,11 +17,11 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
 
-  @StateObject private var session = BeauSession(from: TargetPreset.defaultValue)
+  @StateObject private var session = BeauSession(from: BeauTargetPreset.defaultValue)
 
   @State private var isImporterPresented: Bool = false
   @State private var isReady: Bool = false
-  @State private var selectedTargetPreset: TargetPreset = .defaultValue
+  @State private var selectedTargetPreset: BeauTargetPreset = .defaultValue
   @State private var isAccessing: Bool = false
   @State public var itemProgressPercentage: Float? = nil
   @State public var itemProgressMessage: String = ""
@@ -37,7 +37,7 @@ struct ContentView: View {
   var body: some View {
     VStack(alignment: .leading) {
       Picker("Target", selection: $selectedTargetPreset) {
-        ForEach(TargetPreset.all) { preset in
+        ForEach(BeauTargetPreset.all) { preset in
           Text(preset.label).tag(preset)
         }
       }
@@ -45,7 +45,7 @@ struct ContentView: View {
       .padding(.horizontal, 8.0)
       .onChange(of: selectedTargetPreset) {
         session.setPropertiesFromPreset(selectedTargetPreset)
-        setBeauItemsIsSelectedByVideoPreset(session.items, selectedTargetPreset)
+        selectedTargetPreset.setBeauItemsIsSelected(session.items)
         session.items.forEach { item in
           item.updateTargetResolution(
             CGSize(width: selectedTargetPreset.width, height: selectedTargetPreset.height)
@@ -100,7 +100,7 @@ struct ContentView: View {
                   self.itemProgressPercentage = progressPercentage
                   self.itemProgressMessage = message
                 }
-                setBeauItemsIsSelectedByVideoPreset(session.items, selectedTargetPreset)
+                selectedTargetPreset.setBeauItemsIsSelected(session.items)
                 isReady = session.items.count > 0
               }
             }
