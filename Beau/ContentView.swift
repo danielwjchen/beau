@@ -17,7 +17,9 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
 
-  @StateObject private var session = BeauSession(from: BeauTargetPreset.defaultValue)
+  @StateObject private var session = BeauSession(
+    from: BeauTargetPreset.defaultValue
+  )
 
   @State private var isImporterPresented: Bool = false
   @State private var isReady: Bool = false
@@ -83,6 +85,7 @@ struct ContentView: View {
           itemProgressPercentage = nil
           itemProgressMessage = ""
           session.items = []
+          session.selectedIds.removeAll()
           cleanUpAccess()
           switch result {
           case .success(let urls):
@@ -124,7 +127,7 @@ struct ContentView: View {
           }
         }
         .labelStyle(.titleAndIcon)
-        .disabled(!isReady)
+        .disabled(!isReady || session.selectedIds.isEmpty)
       }
     }
   }
