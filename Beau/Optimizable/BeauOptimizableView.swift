@@ -3,14 +3,31 @@ import SwiftUI
 struct BeauItemView<T: BeauOptimizable>: View {
   @ObservedObject var item: T
   let relativeURL: URL
+  @Binding var selectedIds: Set<UUID>
 
-  init(_ item: T, _ sourceURL: URL) {
+  init(_ item: T, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
     let urlString = item.sourceURL.path.replacingOccurrences(
       of: sourceURL.path,
       with: ""
     )
     self.relativeURL = URL(fileURLWithPath: urlString).deletingLastPathComponent()
     self.item = item
+    self._selectedIds = selectedIds
+  }
+
+  private var isSelected: Binding<Bool> {
+    Binding<Bool>(
+      get: {
+        selectedIds.contains(item.id)
+      },
+      set: { newValue in
+        if newValue {
+          selectedIds.insert(item.id)
+        } else {
+          selectedIds.remove(item.id)
+        }
+      }
+    )
   }
 
   var body: some View {
@@ -23,7 +40,7 @@ struct BeauItemView<T: BeauOptimizable>: View {
           Image(systemName: "checkmark.seal.fill")
             .foregroundColor(.green)
         } else {
-          Toggle("Is Selected", isOn: $item.isSelected)
+          Toggle("Is Selected", isOn: isSelected)
             .labelsHidden()
             .toggleStyle(.checkbox)
         }
@@ -34,12 +51,12 @@ struct BeauItemView<T: BeauOptimizable>: View {
               Image(nsImage: nsImage)
                 .resizable()
                 .scaledToFit()
-                .opacity(item.isSelected ? 1 : 0.5).frame(maxWidth: 100)
+                .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
             } else {
               Image(systemName: "questionmark.square.dashed")
                 .resizable()
                 .scaledToFit()
-                .opacity(item.isSelected ? 1 : 0.5).frame(maxWidth: 100)
+                .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
             }
           }
           .frame(width: 100, height: 100)
@@ -78,25 +95,37 @@ struct BeauItemView<T: BeauOptimizable>: View {
 }
 
 #Preview("Is selected") {
+  @Previewable @State var selectedIds: Set<UUID> = [
+    BeauPreviewMocks.getVideoOptimizableIsSelected().id
+  ]
   BeauItemView(
     BeauPreviewMocks.getVideoOptimizableIsSelected(),
-    BeauPreviewMocks.folderURL
+    BeauPreviewMocks.folderURL,
+    $selectedIds
   )
   .padding(10)
 }
 
 #Preview("Is successful") {
+  @Previewable @State var selectedIds: Set<UUID> = [
+    BeauPreviewMocks.getImageOptimizableSuccessful().id
+  ]
   BeauItemView(
     BeauPreviewMocks.getImageOptimizableSuccessful(),
-    BeauPreviewMocks.folderURL
+    BeauPreviewMocks.folderURL,
+    $selectedIds
   )
   .padding(10)
 }
 
 #Preview("Has errors") {
+  @Previewable @State var selectedIds: Set<UUID> = [
+    BeauPreviewMocks.getImageOptimizableWithError().id
+  ]
   BeauItemView(
     BeauPreviewMocks.getImageOptimizableWithError(),
-    BeauPreviewMocks.folderURL
+    BeauPreviewMocks.folderURL,
+    $selectedIds
   )
   .padding(10)
 }

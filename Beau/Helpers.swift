@@ -189,9 +189,6 @@ func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
 func processBeauMediaOptimizable(
   _ item: any BeauOptimizable, _ tempFileNamePattern: String
 ) async {
-  if !item.isSelected {
-    return
-  }
   item.completionPercentage = 0
   do {
     let tempFileURL = try getTempFileURL(from: item.sourceURL)

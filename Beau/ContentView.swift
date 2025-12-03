@@ -45,7 +45,7 @@ struct ContentView: View {
       .padding(.horizontal, 8.0)
       .onChange(of: selectedTargetPreset) {
         session.setPropertiesFromPreset(selectedTargetPreset)
-        selectedTargetPreset.setBeauItemsIsSelected(session.items)
+        session.setSelectedIds(selectedTargetPreset)
         session.items.forEach { item in
           item.updateTargetResolution(
             CGSize(width: selectedTargetPreset.width, height: selectedTargetPreset.height)
@@ -100,7 +100,7 @@ struct ContentView: View {
                   self.itemProgressPercentage = progressPercentage
                   self.itemProgressMessage = message
                 }
-                selectedTargetPreset.setBeauItemsIsSelected(session.items)
+                session.setSelectedIds(selectedTargetPreset)
                 isReady = session.items.count > 0
               }
             }
@@ -114,6 +114,9 @@ struct ContentView: View {
           isReady = false
           Task {
             for i in session.items.indices {
+              if !session.selectedIds.contains(session.items[i].id) {
+                continue
+              }
               await processBeauMediaOptimizable(session.items[i], session.tempFileNamePattern)
             }
             session.timeEnd = Date()

@@ -38,22 +38,4 @@ struct BeauTargetPreset: Identifiable, Hashable {
   func getResolution() -> String {
     return "\(self.width)x\(self.height)"
   }
-
-  func setBeauItemsIsSelected(
-    _ items: [any BeauOptimizable]
-  ) {
-    items.forEach({ item in
-      if let width = item.sourceResolution?.width,
-        let height = item.sourceResolution?.height
-      {
-        item.isSelected =
-          ((width > self.width
-            && height > self.height)
-            || (height > self.width
-              && width > self.height))
-      } else {
-        item.isSelected = false
-      }
-    })
-  }
 }

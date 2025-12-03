@@ -9,6 +9,7 @@ class BeauSession: ObservableObject {
   var sourceURL: URL?
   var targetURL: URL?
   var preservesFolders: Bool
+  @Published var selectedIds: Set<UUID> = []
   @Published var items: [any BeauOptimizable] = []
   @Published var timeBegin: Date?
   @Published var timeEnd: Date?
@@ -56,5 +57,24 @@ class BeauSession: ObservableObject {
   public func setPropertiesFromPreset(_ preset: BeauTargetPreset) {
     self.resolution = preset.getResolution()
     self.encoding = preset.encoding
+  }
+
+  public func setSelectedIds(
+    _ preset: BeauTargetPreset
+  ) {
+    self.selectedIds.removeAll()
+    self.items.forEach({ item in
+      if let width = item.sourceResolution?.width,
+        let height = item.sourceResolution?.height
+      {
+        if (width > preset.width
+          && height > preset.height)
+          || (height > preset.width
+            && width > preset.height)
+        {
+          self.selectedIds.insert(item.id)
+        }
+      }
+    })
   }
 }

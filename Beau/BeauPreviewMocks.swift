@@ -13,7 +13,6 @@ struct BeauPreviewMocks {
     item.targetEncoding = "h265"
     item.sourceSize = 50_000_000
     item.timeBegin = Date()
-    item.isSelected = true
     return item
   }
 
@@ -28,7 +27,6 @@ struct BeauPreviewMocks {
     item.sourceSize = 50_000_000
     item.completionPercentage = 0.5
     item.timeBegin = Date()
-    item.isSelected = true
     return item
   }
 
@@ -41,7 +39,6 @@ struct BeauPreviewMocks {
     item.targetSize = 3_000_000
     item.timeBegin = Date()
     item.timeEnd = Date().addingTimeInterval(60)
-    item.isSelected = true
     return item
   }
 
@@ -53,7 +50,6 @@ struct BeauPreviewMocks {
     item.sourceSize = 20_000_000
     item.error = "Failed to optimize image due to unsupported format."
     item.timeBegin = Date()
-    item.isSelected = false
     return item
   }
 

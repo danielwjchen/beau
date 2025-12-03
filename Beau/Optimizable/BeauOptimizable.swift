@@ -1,7 +1,8 @@
 import CoreGraphics
 import Foundation
 
-protocol BeauOptimizable: ObservableObject, AnyObject {
+protocol BeauOptimizable: ObservableObject, Identifiable, AnyObject {
+  var id: UUID { get }
   var timeBegin: Date? { get set }
   var timeEnd: Date? { get set }
   var sourceURL: URL { get set }
@@ -16,7 +17,6 @@ protocol BeauOptimizable: ObservableObject, AnyObject {
 
   var error: String { get set }
   var completionPercentage: Float? { get set }
-  var isSelected: Bool { get set }
   init(sourceURL: URL)
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
     async throws

@@ -10,14 +10,18 @@ struct BeauSessionView: View {
   var body: some View {
     VStack(alignment: .leading) {
       if let sourceURL = session.sourceURL {
-        BeauBreadcrumbPathView(url: sourceURL)
-          .padding(8)
-        List(session.items, id: \.sourceURL) { item in
+        HStack(alignment: .center) {
+          Text("\(self.session.selectedIds.count)/\(self.session.items.count) selected")
+            .font(.footnote)
+          BeauBreadcrumbPathView(url: sourceURL)
+        }
+        .padding(8)
+        List(session.items, id: \.id) { item in
           // Type erasure to determine the concrete type of BeauMediaOptimizable
           if let videoItem = item as? BeauVideoOptimizable {
-            BeauItemView(videoItem, sourceURL)
+            BeauItemView(videoItem, sourceURL, $session.selectedIds)
           } else if let imageItem = item as? BeauImageOptimizable {
-            BeauItemView(imageItem, sourceURL)
+            BeauItemView(imageItem, sourceURL, $session.selectedIds)
           } else {
             Text("Unsupported item type")
           }
