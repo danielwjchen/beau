@@ -26,27 +26,25 @@ struct BeauBreadcrumbPathView: View {
   }
 
   var body: some View {
-    ScrollView(.horizontal, showsIndicators: false) {
-      HStack(spacing: 4) {
-        if hasLeadingChevron {
+    HStack(spacing: 4) {
+      if hasLeadingChevron {
+        Image(systemName: "chevron.right")
+          .font(.caption)
+          .foregroundColor(.secondary)
+      }
+      ForEach(Array(components.enumerated()), id: \.0) { index, element in
+        Text(element)
+          .font(.caption)
+          .foregroundColor(.primary)
+        if index < components.count - 1 {
           Image(systemName: "chevron.right")
             .font(.caption)
             .foregroundColor(.secondary)
         }
-        ForEach(Array(components.enumerated()), id: \.0) { index, element in
-          Text(element)
-            .font(.caption)
-            .foregroundColor(.primary)
-          if index < components.count - 1 {
-            Image(systemName: "chevron.right")
-              .font(.caption)
-              .foregroundColor(.secondary)
-          }
-        }
       }
-      .lineLimit(1)
-      .truncationMode(.middle)
     }
+    .lineLimit(1)
+    .truncationMode(.middle)
   }
 }
 
