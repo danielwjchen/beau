@@ -24,6 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6509AF842EEF256E008C8644 /* Beau.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Beau.xctestplan; sourceTree = "<group>"; };
 		658A41C42EA6959D00008D4E /* Beau.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Beau.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		658A41D42EA6959E00008D4E /* BeauTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeauTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		658A41DE2EA6959E00008D4E /* BeauUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeauUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,6 +76,7 @@
 		658A41BB2EA6959D00008D4E = {
 			isa = PBXGroup;
 			children = (
+				6509AF842EEF256E008C8644 /* Beau.xctestplan */,
 				658A41C62EA6959D00008D4E /* Beau */,
 				658A41D72EA6959E00008D4E /* BeauTests */,
 				658A41E12EA6959E00008D4E /* BeauUITests */,

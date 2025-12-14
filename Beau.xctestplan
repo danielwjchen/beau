@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "E11048EF-3BA8-4685-BEDB-BE0AFCE872B8",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Beau.xcodeproj",
+      "identifier" : "658A41C32EA6959D00008D4E",
+      "name" : "Beau"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Beau.xcodeproj",
+        "identifier" : "658A41D32EA6959E00008D4E",
+        "name" : "BeauTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Beau.xcodeproj",
+        "identifier" : "658A41DD2EA6959E00008D4E",
+        "name" : "BeauUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
