@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1024 1024"
+   version="1.1"
+   id="svg16"
+   sodipodi:docname="AppIcon.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   inkscape:export-filename="AppIcon.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:bx="https://boxy-svg.com">
+  <sodipodi:namedview
+     id="namedview16"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:export-bgcolor="#ffffff00"
+     inkscape:zoom="0.6486084"
+     inkscape:cx="913.49418"
+     inkscape:cy="482.57161"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs12">
+    <filter
+       id="shadow"
+       bx:pinned="true"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <title
+         id="title1">Drop Shadow</title>
+      <feDropShadow
+         result="drop-shadow-0"
+         in="SourceGraphic"
+         style="flood-opacity: 0.3;"
+         stdDeviation="10"
+         dx="0"
+         dy="10" />
+    </filter>
+    <bx:guide
+       x="-10"
+       y="100"
+       angle="90" />
+    <bx:guide
+       x="100"
+       y="-10"
+       angle="0" />
+    <bx:guide
+       x="924"
+       y="-10"
+       angle="0" />
+    <bx:guide
+       x="-10"
+       y="924"
+       angle="90" />
+    <clipPath
+       id="clip-0">
+      <path
+         style="stroke-width: 3px; fill: rgb(255, 255, 255);"
+         d="M 100 724 L 100 300 C 100 185.001 170 99.995 300.026 100 L 724 99.995 C 854 100 924 185.001 924 300 L 924 724 C 924 839.001 854 923.995 724 924 L 300.026 924 C 170 924 100 839.001 100 724 Z"
+         id="path2">
+        <title
+           id="title2">Icon Mask</title>
+      </path>
+    </clipPath>
+    <symbol
+       id="symbol-0"
+       viewBox="0 0 1024 1024"
+       bx:pinned="true">
+      <title
+         id="title3">App Icon Guides</title>
+      <g
+         style=""
+         transform="matrix(1, 0, 0, 1, 0, 0)"
+         id="g12">
+        <title
+           id="title4">App Icon Guides</title>
+        <path
+           style="fill: none; stroke: rgb(145, 145, 145); stroke-width: 3px;"
+           d="M 0 739.001 L 0 285.001 C 0 135.001 112 0 284.999 0 L 739.001 0 C 912 0 1024 135.001 1024 285.001 L 1024 739.001 C 1024 889.001 912 1024 739.001 1024 L 284.999 1024 C 112 1024 0 889.001 0 739.001 Z"
+           id="path5">
+          <title
+             id="title5">Outer Bounding Box</title>
+        </path>
+        <path
+           style="stroke: rgb(145, 145, 145); fill: none; stroke-width: 3px;"
+           d="M 50 739.001 L 50 285.001 C 50 162 140 50 284.999 50 L 739.001 50 C 884.001 50 974 162 974 285.001 L 974 739.001 C 974 862 884.001 974 739.001 974 L 284.999 974 C 140 974 50 862 50 739.001 Z"
+           id="path6">
+          <title
+             id="title6">Inner Bounding Box</title>
+        </path>
+        <path
+           style="fill: none; stroke: rgb(255, 0, 0); stroke-width: 3px;"
+           d="M 100 724.005 L 100 300.005 C 100 185.006 170 100 300.026 100.005 L 724 100 C 854 100.005 924 185.006 924 300.005 L 924 724.005 C 924 839.006 854 924 724 924.005 L 300.026 924.005 C 170 924.005 100 839.006 100 724.005 Z"
+           id="path7">
+          <title
+             id="title7">Icon Grid Bounding Box</title>
+        </path>
+        <path
+           style="fill: none; stroke: rgb(255, 0, 0);"
+           d="M 154.017 870.001 L 870.001 870.001 L 870.001 154.014 L 154.017 154.014 L 154.017 870.001 Z M 154.017 870.001 L 870.001 154.014 L 154.017 870.001 Z M 100 511.995 L 924 511.995 L 100 511.995 Z M 100 669.36 L 924 669.36 L 100 669.36 Z M 924 354.631 L 100 354.631 L 924 354.631 Z M 669.365 99.995 L 669.365 923.995 L 669.365 99.995 Z M 354.635 923.995 L 354.635 99.995 L 354.635 923.995 Z M 512 99.995 L 512 923.995 L 512 99.995 Z M 154.017 154.014 L 870.001 870.001 L 154.017 154.014 Z"
+           id="path8">
+          <title
+             id="title8">Icon Grid</title>
+        </path>
+        <circle
+           style="fill: none; stroke: rgba(255, 0, 0, 0.6);"
+           cx="512"
+           cy="511.995"
+           r="157.397"
+           id="circle9">
+          <title
+             id="title9">Grid Circle 1</title>
+        </circle>
+        <circle
+           style="fill: none; stroke: rgba(255, 0, 0, 0.6);"
+           cx="512"
+           cy="511.995"
+           r="222.577"
+           id="circle10">
+          <title
+             id="title10">Grid Circle 2</title>
+        </circle>
+        <circle
+           style="fill: none; stroke: rgba(255, 0, 0, 0.6);"
+           cx="512"
+           cy="511.995"
+           r="358.001"
+           id="circle11">
+          <title
+             id="title11">Grid Circle 3</title>
+        </circle>
+        <path
+           d="M 1084.343 548.001 L 143.343 548.001 C 114.624 548.001 91.343 524.72 91.343 496.001 C 91.343 467.282 114.624 444.001 143.343 444.001 L 1084.343 444.001 C 1113.062 444.001 1136.343 467.282 1136.343 496.001 C 1136.343 524.72 1113.062 548.001 1084.343 548.001 Z M 1136.3 496.039 L 91.3 495.961"
+           style="stroke-width: 5px; fill: rgba(0, 195, 255, 0.37); stroke: rgb(0, 119, 255); stroke-dasharray: 24, 10;"
+           transform="matrix(0.430444, -0.902617, 0.902617, 0.430444, -98.093403, 836.54613)"
+           id="path12">
+          <title
+             id="title12">Tool Angle</title>
+        </path>
+      </g>
+    </symbol>
+  </defs>
+  <g
+     style="display:none;filter:url(#shadow)"
+     id="g16"
+     sodipodi:insensitive="true">
+    <title
+       id="title13">App Icon (w/ Shadow)</title>
+    <g
+       clip-path="url(#clip-0)"
+       id="g15"
+       style="display:inline">
+      <title
+         id="title14">Background (Masked)</title>
+      <path
+         style="display:inline;fill:#ffffff;stroke-width:3px"
+         d="M 100,724 V 300 C 100,185.001 170,99.995 300.026,100 L 724,99.995 C 854,100 924,185.001 924,300 v 424 c 0,115.001 -70,199.995 -200,200 H 300.026 C 170,924 100,839.001 100,724 Z"
+         id="path15">
+        <title
+           id="title15">Icon Shape</title>
+      </path>
+    </g>
+  </g>
+  <use
+     width="1024"
+     height="1024"
+     style="display:none"
+     xlink:href="#symbol-0"
+     id="use16">
+    <title
+       id="title16">App Icon Guides</title>
+  </use>
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Icon">
+    <path
+       d="m 482.05199,156.2697 q 143.75045,0 212.50067,40.62513 68.75022,40.10429 68.75022,121.35455 0,124.47956 -148.95881,179.68807 182.81308,27.60425 182.81308,166.66719 0,91.66697 -73.95857,147.3963 -73.95856,55.20852 -259.37582,55.20852 L 233.6137,867.7303 q -6.77085,-17.70839 -6.77085,-33.33344 0,-10.4167 5.20835,-15.10422 5.72918,-5.20835 18.22922,-5.20835 h 38.54179 q 3.64584,-72.91689 3.64584,-314.58432 0,-217.1882 -3.64584,-289.58426 H 233.6137 q -6.77085,-17.70838 -6.77085,-32.8126 0,-10.93753 5.20835,-15.62505 5.72918,-5.20835 18.22922,-5.20835 z m -73.95857,505.73077 q 0,91.66696 13.02087,110.41702 13.54171,18.75006 96.87531,18.75006 81.25026,0 116.1462,-28.12509 35.41678,-28.64593 35.41678,-90.10446 0,-67.70854 -44.79181,-103.64616 -44.79181,-36.45845 -136.45876,-36.45845 -43.75014,0 -80.20859,5.20835 z m 0,-198.95896 q 30.20843,4.16668 67.18771,4.16668 85.41694,0 122.91706,-30.20843 37.50012,-30.20843 37.50012,-87.50028 0,-60.41686 -37.50012,-88.54195 -36.97929,-28.64592 -116.1462,-28.64592 -37.50012,0 -71.3544,5.20835 -2.08334,66.66688 -2.60417,225.52155 z"
+       id="text16"
+       style="font-size:1066.67px;font-family:Kefa;-inkscape-font-specification:Kefa;display:inline;fill:#ffffff;stroke:none;stroke-opacity:1;fill-opacity:1"
+       aria-label="B" />
+  </g>
+</svg>
