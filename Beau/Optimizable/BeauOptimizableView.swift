@@ -48,10 +48,19 @@ struct BeauItemView<T: BeauOptimizable>: View {
           VStack {
             if let cgImage = item.thumbnail {
               let nsImage = NSImage(cgImage: cgImage, size: .zero)
-              Image(nsImage: nsImage)
-                .resizable()
-                .scaledToFit()
-                .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
+              let imageUrl = item.completionPercentage == 1 ? item.targetURL : item.sourceURL
+              Button {
+                NSWorkspace.shared.open(imageUrl)
+              } label: {
+                Image(nsImage: nsImage)
+                  .resizable()
+                  .scaledToFit()
+                  .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
+              }
+              .buttonStyle(.plain)
+              .onHover { hovering in
+                hovering ? NSCursor.pointingHand.push() : NSCursor.pop()
+              }
             } else {
               Image(systemName: "questionmark.square.dashed")
                 .resizable()
