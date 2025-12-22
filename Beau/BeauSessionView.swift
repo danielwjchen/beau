@@ -20,11 +20,15 @@ struct BeauSessionView: View {
           // Type erasure to determine the concrete type of BeauMediaOptimizable
           if let videoItem = item as? BeauVideoOptimizable {
             BeauItemView(videoItem, sourceURL, $session.selectedIds)
+              .listRowSeparator(.hidden)
           } else if let imageItem = item as? BeauImageOptimizable {
             BeauItemView(imageItem, sourceURL, $session.selectedIds)
+              .listRowSeparator(.hidden)
           } else {
             Text("Unsupported item type")
+              .listRowSeparator(.hidden)
           }
+          Divider()
         }
       } else {
         Text("No source directory selected.")
