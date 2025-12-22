@@ -45,30 +45,27 @@ struct BeauItemView<T: BeauOptimizable>: View {
             .toggleStyle(.checkbox)
         }
         HStack(alignment: .top, spacing: 2) {
-          VStack {
-            if let cgImage = item.thumbnail {
-              let nsImage = NSImage(cgImage: cgImage, size: .zero)
-              let imageUrl = item.completionPercentage == 1 ? item.targetURL : item.sourceURL
-              Button {
-                NSWorkspace.shared.open(imageUrl)
-              } label: {
-                Image(nsImage: nsImage)
-                  .resizable()
-                  .scaledToFit()
-                  .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
-              }
-              .buttonStyle(.plain)
-              .onHover { hovering in
-                hovering ? NSCursor.pointingHand.push() : NSCursor.pop()
-              }
-            } else {
-              Image(systemName: "questionmark.square.dashed")
+          if let cgImage = item.thumbnail {
+            let nsImage = NSImage(cgImage: cgImage, size: .zero)
+            let imageUrl = item.completionPercentage == 1 ? item.targetURL : item.sourceURL
+            Button {
+              NSWorkspace.shared.open(imageUrl)
+            } label: {
+              Image(nsImage: nsImage)
                 .resizable()
                 .scaledToFit()
                 .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
             }
+            .buttonStyle(.plain)
+            .onHover { hovering in
+              hovering ? NSCursor.pointingHand.push() : NSCursor.pop()
+            }
+          } else {
+            Image(systemName: "questionmark.square.dashed")
+              .resizable()
+              .scaledToFit()
+              .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
           }
-          .frame(width: 100, height: 100)
           VStack(alignment: .leading) {
             BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
               .padding(10)
