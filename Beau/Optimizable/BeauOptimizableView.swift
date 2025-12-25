@@ -36,66 +36,71 @@ struct BeauItemView<T: BeauOptimizable>: View {
         if item.error != "" {
           Image(systemName: "exclamationmark.triangle.fill")
             .foregroundColor(.red)
+            .debugHover()
         } else if item.timeEnd != nil {
           Image(systemName: "checkmark.seal.fill")
             .foregroundColor(.green)
+            .debugHover()
         } else {
           Toggle("Is Selected", isOn: isSelected)
             .labelsHidden()
             .toggleStyle(.checkbox)
+            .debugHover()
+
         }
-        HStack(alignment: .top, spacing: 2) {
-          if let cgImage = item.thumbnail {
-            let nsImage = NSImage(cgImage: cgImage, size: .zero)
-            let imageUrl = item.completionPercentage == 1 ? item.targetURL : item.sourceURL
-            Button {
-              NSWorkspace.shared.open(imageUrl)
-            } label: {
-              Image(nsImage: nsImage)
-                .resizable()
-                .scaledToFit()
-                .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
-            }
-            .buttonStyle(.plain)
-            .onHover { hovering in
-              hovering ? NSCursor.pointingHand.push() : NSCursor.pop()
-            }
-          } else {
-            Image(systemName: "questionmark.square.dashed")
+        if let cgImage = item.thumbnail {
+          let nsImage = NSImage(cgImage: cgImage, size: .zero)
+          let imageUrl = item.completionPercentage == 1 ? item.targetURL : item.sourceURL
+          Button {
+            NSWorkspace.shared.open(imageUrl)
+          } label: {
+            Image(nsImage: nsImage)
               .resizable()
               .scaledToFit()
               .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
           }
-          VStack(alignment: .leading) {
-            BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
-              .padding(10)
-            Spacer()
-            HStack(alignment: .bottom) {
-              BeauNameAndSizeView(
-                name: item.sourceURL.lastPathComponent,
-                resolution: item.sourceResolution,
-                fileSize: item.sourceSize
-              )
-              Spacer()
-              BeauNameAndSizeView(
-                name: item.targetURL.lastPathComponent,
-                resolution: item.targetResolution,
-                fileSize: item.targetSize
-              )
-            }
-          }.frame(maxHeight: 100)
+          .buttonStyle(.plain)
+          .onHover { hovering in
+            hovering ? NSCursor.pointingHand.push() : NSCursor.pop()
+          }
+          .debugHover()
+        } else {
+          Image(systemName: "questionmark.square.dashed")
+            .resizable()
+            .scaledToFit()
+            .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
+            .debugHover()
         }
+        VStack(alignment: .leading) {
+          BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
+            .padding(10)
+          Spacer()
+          HStack(alignment: .bottom) {
+            BeauNameAndSizeView(
+              name: item.sourceURL.lastPathComponent,
+              resolution: item.sourceResolution,
+              fileSize: item.sourceSize
+            )
+            Spacer()
+            BeauNameAndSizeView(
+              name: item.targetURL.lastPathComponent,
+              resolution: item.targetResolution,
+              fileSize: item.targetSize
+            )
+          }
+        }.frame(maxHeight: 100)
       }
+      .debugHover()
       ProgressView(value: item.completionPercentage)
         .opacity(
           item.completionPercentage == nil
             || item.completionPercentage! >= 1
             ? 0 : 1
         )
-      if !item.error.isEmpty {
-        Text(item.error)
-          .foregroundColor(.red)
-      }
+    }
+    if !item.error.isEmpty {
+      Text(item.error)
+        .foregroundColor(.red)
     }
   }
 }
@@ -109,6 +114,7 @@ struct BeauItemView<T: BeauOptimizable>: View {
     BeauPreviewMocks.folderURL,
     $selectedIds
   )
+  .debugHover()
   .padding(10)
 }
 
