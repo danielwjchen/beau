@@ -9,11 +9,7 @@ import SwiftUI
 // Extension to make it easy to use
 extension View {
   func debugHover(color: Color = .orange) -> some View {
-    #if DEBUG
-      self.modifier(InspectorModifier(color))
-    #else
-      self
-    #endif
+    self.modifier(InspectorModifier(color))
   }
 }
 
