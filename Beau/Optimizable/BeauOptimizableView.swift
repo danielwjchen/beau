@@ -36,22 +36,13 @@ struct BeauItemView<T: BeauOptimizable>: View {
         if item.error != "" {
           Image(systemName: "exclamationmark.triangle.fill")
             .foregroundColor(.red)
-            #if DEBUG
-              .debugHover()
-            #endif
         } else if item.timeEnd != nil {
           Image(systemName: "checkmark.seal.fill")
             .foregroundColor(.green)
-            #if DEBUG
-              .debugHover()
-            #endif
         } else {
           Toggle("Is Selected", isOn: isSelected)
             .labelsHidden()
             .toggleStyle(.checkbox)
-            #if DEBUG
-              .debugHover()
-            #endif
 
         }
         if let cgImage = item.thumbnail {
@@ -69,17 +60,11 @@ struct BeauItemView<T: BeauOptimizable>: View {
           .onHover { hovering in
             hovering ? NSCursor.pointingHand.push() : NSCursor.pop()
           }
-          #if DEBUG
-            .debugHover()
-          #endif
         } else {
           Image(systemName: "questionmark.square.dashed")
             .resizable()
             .scaledToFit()
             .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
-            #if DEBUG
-              .debugHover()
-            #endif
         }
         VStack(alignment: .leading) {
           BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
@@ -100,9 +85,6 @@ struct BeauItemView<T: BeauOptimizable>: View {
           }
         }.frame(maxHeight: 100)
       }
-      #if DEBUG
-        .debugHover()
-      #endif
       ProgressView(value: item.completionPercentage)
         .opacity(
           item.completionPercentage == nil
@@ -126,7 +108,6 @@ struct BeauItemView<T: BeauOptimizable>: View {
     BeauPreviewMocks.folderURL,
     $selectedIds
   )
-  .debugHover()
   .padding(10)
 }
 

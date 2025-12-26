@@ -51,16 +51,6 @@
 			path = BeauUITests;
 			sourceTree = "<group>";
 		};
-		658CDE632EFD98E7001EF726 /* Modifiers */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Modifiers;
-			sourceTree = "<group>";
-		};
-		658CDE662EFDA5D3001EF726 /* Extensions */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Extensions;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,8 +81,6 @@
 		658A41BB2EA6959D00008D4E = {
 			isa = PBXGroup;
 			children = (
-				658CDE662EFDA5D3001EF726 /* Extensions */,
-				658CDE632EFD98E7001EF726 /* Modifiers */,
 				653E7BDE2EF10D05000DE636 /* BeauAppIcon.icon */,
 				6509AF842EEF256E008C8644 /* Beau.xctestplan */,
 				658A41C62EA6959D00008D4E /* Beau */,
@@ -129,8 +117,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				658A41C62EA6959D00008D4E /* Beau */,
-				658CDE632EFD98E7001EF726 /* Modifiers */,
-				658CDE662EFDA5D3001EF726 /* Extensions */,
 			);
 			name = Beau;
 			packageProductDependencies = (
