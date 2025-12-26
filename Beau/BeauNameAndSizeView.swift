@@ -45,7 +45,8 @@ struct BeauNameAndSizeView: View {
     }
     .frame(
       minWidth: 100,
-      maxWidth: 200
+      maxWidth: 200,
+      alignment: .leading
     )
   }
 }
