@@ -26,6 +26,10 @@ class BeauVideoOptimizable: BeauOptimizable {
     self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("mp4")
   }
 
+  func hasBeenOptimized() throws -> Bool {
+    return false
+  }
+
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
     async throws
   {

@@ -1,6 +1,8 @@
 import CoreGraphics
 import Foundation
 
+let appSignature = "Optimized with Beau"
+
 protocol BeauOptimizable: ObservableObject, Identifiable, AnyObject {
   var id: UUID { get }
   var timeBegin: Date? { get set }
@@ -18,6 +20,7 @@ protocol BeauOptimizable: ObservableObject, Identifiable, AnyObject {
   var error: String { get set }
   var completionPercentage: Float? { get set }
   init(sourceURL: URL)
+  func hasBeenOptimized() throws -> Bool
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
     async throws
   func updateTargetResolution(_ targetResolution: CGSize)

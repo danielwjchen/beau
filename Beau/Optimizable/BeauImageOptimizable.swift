@@ -28,6 +28,26 @@ class BeauImageOptimizable: BeauOptimizable {
     self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("jpg")
   }
 
+  func hasBeenOptimized() throws -> Bool {
+    let imageData = try Data(contentsOf: sourceURL)
+
+    guard let source = CGImageSourceCreateWithData(imageData as CFData, nil) else { return false }
+
+    // 1. Fetch properties
+    guard let metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any],
+      let exif = metadata[kCGImagePropertyExifDictionary as String] as? [String: Any]
+    else {
+      return false
+    }
+
+    // 2. Check for your specific signature
+    if let comment = exif[kCGImagePropertyExifUserComment as String] as? String {
+      return comment == appSignature
+    }
+
+    return false
+  }
+
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
     async throws
   {
