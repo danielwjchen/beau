@@ -61,7 +61,7 @@ class BeauPDFOptimizable: BeauOptimizable {
       .init(rawValue: "QuartzFilter"): quartzFilter
     ]
 
-    let success = pdfDocument.write(to: targetURL, withOptions: writeOptions)
+    let success = pdfDocument.write(to: tempFileURL, withOptions: writeOptions)
     progressHandler(0.7)
 
     guard success else {
@@ -81,9 +81,6 @@ class BeauPDFOptimizable: BeauOptimizable {
     }
     let page = pdfDocument.page(at: pageIndex)
     let pageRect = page?.bounds(for: .mediaBox)
-
-    print(
-      "pdf page width =", (pageRect?.size.width)!, "pdf page height =", (pageRect?.size.height)!)
 
     return CGSize(width: (pageRect?.size.width)!, height: (pageRect?.size.height)!)
 
