@@ -63,7 +63,7 @@ func getFileSize(at url: URL) throws -> Int64? {
   return attributes[.size] as? Int64
 }
 
-func createBeauMediaOptimizable(
+func createBeauOptimizable(
   _ fileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
   progressStep: Float = 0.9,
   progressHandler: @escaping (Float, String) -> Void
@@ -187,7 +187,7 @@ func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
   #endif
 }
 
-func processBeauMediaOptimizable(
+func processBeauOptimizable(
   _ item: any BeauOptimizable, _ tempFileNamePattern: String
 ) async {
   item.completionPercentage = 0

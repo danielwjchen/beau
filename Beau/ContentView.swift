@@ -97,7 +97,7 @@ struct ContentView: View {
               let targetResolution = CGSize(width: 1920, height: 1080)
               let targetEncoding = ""
               Task {
-                session.items = await createBeauMediaOptimizable(
+                session.items = await createBeauOptimizable(
                   fileURLs, targetResolution, targetEncoding
                 ) { progressPercentage, message in
                   self.itemProgressPercentage = progressPercentage
@@ -120,7 +120,7 @@ struct ContentView: View {
               if !session.selectedIds.contains(session.items[i].id) {
                 continue
               }
-              await processBeauMediaOptimizable(session.items[i], session.tempFileNamePattern)
+              await processBeauOptimizable(session.items[i], session.tempFileNamePattern)
             }
             session.timeEnd = Date()
             cleanUpAccess()
