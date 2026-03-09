@@ -1,0 +1,49 @@
+# --- Xcode ---
+# Build artifacts and derived data
+build/
+DerivedData/
+*.moved-aside
+*.xcuserstate
+
+# Personal Xcode settings (window positions, open files, etc.)
+xcuserdata/
+# Force-include shared data if you use Shared Schemes
+!default.xcuserdatad/
+!**/xcshareddata/
+
+# Xcode 13+ Package resolution (often ignored to let CI/devs resolve fresh)
+.swiftpm/xcode/package.resolved
+.swiftpm/xcode/xcuserdata/
+
+# --- Swift Package Manager ---
+# The build directory for SPM
+.build/
+.swiftpm/
+# If you prefer to lock versions, comment out the line below
+Package.resolved
+
+# --- Build Server Protocol (LSP) ---
+# Metadata for language servers
+.buildserver/
+buildServer.json
+
+# --- macOS System Files ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# --- Python / Tooling (if applicable) ---
+# Since you use Ruff/Python for scripting
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.ruff_cache/
+
+# --- Artifacts & Logging ---
+*.log
+*.swp
+*.lock
