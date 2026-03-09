@@ -227,6 +227,8 @@ func getBeauMediaOptimizableType(for url: URL) -> (any BeauOptimizable.Type)? {
         return BeauVideoOptimizable.self
       } else if contentType.conforms(to: .image) {
         return BeauImageOptimizable.self
+      } else if contentType.conforms(to: .pdf) {
+        return BeauPDFOptimizable.self
       }
     }
   } catch {

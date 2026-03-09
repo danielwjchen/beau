@@ -24,6 +24,9 @@ struct BeauSessionView: View {
           } else if let imageItem = item as? BeauImageOptimizable {
             BeauItemView(imageItem, sourceURL, $session.selectedIds)
               .listRowSeparator(.hidden)
+          } else if let pdfItem = item as? BeauPDFOptimizable {
+            BeauItemView(pdfItem, sourceURL, $session.selectedIds)
+              .listRowSeparator(.hidden)
           } else {
             Text("Unsupported item type")
               .listRowSeparator(.hidden)
