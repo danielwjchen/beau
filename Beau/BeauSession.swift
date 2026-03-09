@@ -71,6 +71,7 @@ class BeauSession: ObservableObject {
           && height > preset.height)
           || (height > preset.width
             && width > preset.height)
+          || type(of: item) == BeauPDFOptimizable.self
         {
           self.selectedIds.insert(item.id)
         }
