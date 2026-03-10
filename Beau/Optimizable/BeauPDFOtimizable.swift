@@ -21,23 +21,23 @@ class BeauPDFOptimizable: BeauOptimizable {
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
   @Published var thumbnail: CGImage?
+  @Published var processedOn: Date?
 
   required init(
     sourceURL: URL
   ) {
     self.sourceURL = sourceURL
     self.targetURL = sourceURL
-  }
-
-  func hasBeenOptimized() throws -> Bool {
     let pdfDocument = PDFDocument(url: sourceURL)
     let attributes = pdfDocument?.documentAttributes ?? [:]
     if let existing = attributes[PDFDocumentAttribute.keywordsAttribute] as? [String] {
-      if existing.contains(appSignature) {
-        return true
+      for keyword in existing {
+        if let date = getProcessedOnDate(value: keyword) {
+          self.processedOn = date
+          break
+        }
       }
     }
-    return false
   }
 
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)

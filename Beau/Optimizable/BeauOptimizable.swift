@@ -16,11 +16,11 @@ protocol BeauOptimizable: ObservableObject, Identifiable, AnyObject {
   var sourceSize: Int64? { get set }
   var targetSize: Int64? { get set }
   var thumbnail: CGImage? { get set }
+  var processedOn: Date? { get set }
 
   var error: String { get set }
   var completionPercentage: Float? { get set }
   init(sourceURL: URL)
-  func hasBeenOptimized() throws -> Bool
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
     async throws
   func updateTargetResolution(_ targetResolution: CGSize)
@@ -36,5 +36,22 @@ extension BeauOptimizable {
       width: (sourceResolution?.width ?? 0) * scale,
       height: (sourceResolution?.height ?? 0) * scale
     )
+  }
+
+  func getProcessedOnDate(value: String) -> Date? {
+    let pieces = value.components(separatedBy: "\(appSignature):")
+    if pieces.count == 2 {
+      let dateString = pieces[1].trimmingCharacters(in: .whitespacesAndNewlines).replacing(
+        ")", with: "")
+      let formatter = ISO8601DateFormatter()
+      return formatter.date(from: dateString)
+    }
+    return nil
+  }
+
+  func getSignature() -> String {
+    let formatter = ISO8601DateFormatter()
+    let timestamp = formatter.string(from: Date())
+    return "(\(appSignature): \(timestamp))"
   }
 }

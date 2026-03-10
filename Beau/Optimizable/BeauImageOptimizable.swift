@@ -20,32 +20,34 @@ class BeauImageOptimizable: BeauOptimizable {
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
   @Published var thumbnail: CGImage?
+  @Published var processedOn: Date?
 
   required init(
     sourceURL: URL
   ) {
     self.sourceURL = sourceURL
     self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("jpg")
-  }
+    do {
+      let imageData = try Data(contentsOf: sourceURL)
 
-  func hasBeenOptimized() throws -> Bool {
-    let imageData = try Data(contentsOf: sourceURL)
+      guard let source = CGImageSourceCreateWithData(imageData as CFData, nil) else {
+        print("Unable to create image source for \(sourceURL).")
+        return
+      }
 
-    guard let source = CGImageSourceCreateWithData(imageData as CFData, nil) else { return false }
+      guard let metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any],
+        let exif = metadata[kCGImagePropertyExifDictionary as String] as? [String: Any]
+      else {
+        print("Unable to read image metadata for \(sourceURL).")
+        return
+      }
 
-    // 1. Fetch properties
-    guard let metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any],
-      let exif = metadata[kCGImagePropertyExifDictionary as String] as? [String: Any]
-    else {
-      return false
+      if let comment = exif[kCGImagePropertyExifUserComment as String] as? String {
+        self.processedOn = getProcessedOnDate(value: comment)
+      }
+    } catch {
+      print("Unable to read image metadata for \(sourceURL).")
     }
-
-    // 2. Check for your specific signature
-    if let comment = exif[kCGImagePropertyExifUserComment as String] as? String {
-      return comment == appSignature
-    }
-
-    return false
   }
 
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)

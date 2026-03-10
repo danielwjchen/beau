@@ -18,16 +18,26 @@ class BeauVideoOptimizable: BeauOptimizable {
   @Published var error: String = ""
   @Published var completionPercentage: Float? = nil
   @Published var thumbnail: CGImage?
+  @Published var processedOn: Date?
 
   required init(
     sourceURL: URL
   ) {
     self.sourceURL = sourceURL
     self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("mp4")
-  }
+    let asset = AVAsset(url: sourceURL)
 
-  func hasBeenOptimized() throws -> Bool {
-    return false
+    Task {
+      do {
+        let metadata = try await asset.load(.metadata)
+        for item in metadata {
+          guard let value = try await item.load(.value) as? String else { return }
+          self.processedOn = getProcessedOnDate(value: value)
+        }
+      } catch {
+        print("Unable to read video metadata for \(sourceURL).")
+      }
+    }
   }
 
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
