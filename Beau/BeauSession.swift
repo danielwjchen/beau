@@ -64,6 +64,9 @@ class BeauSession: ObservableObject {
   ) {
     self.selectedIds.removeAll()
     self.items.forEach({ item in
+      if item.processedOn != nil {
+        return
+      }
       if let width = item.sourceResolution?.width,
         let height = item.sourceResolution?.height
       {

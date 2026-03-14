@@ -61,6 +61,15 @@ class BeauPDFOptimizable: BeauOptimizable {
       .init(rawValue: "QuartzFilter"): quartzFilter
     ]
 
+    var attributes = pdfDocument.documentAttributes ?? [:]
+    let signature = getSignature()
+    if let existing = attributes[PDFDocumentAttribute.keywordsAttribute] as? [String] {
+      let filtered = existing.filter { !$0.contains(BEAU_SIGNATURE) }
+      attributes[PDFDocumentAttribute.keywordsAttribute] = filtered + [signature]
+    } else {
+      attributes[PDFDocumentAttribute.keywordsAttribute] = [signature]
+    }
+    pdfDocument.documentAttributes = attributes
     let success = pdfDocument.write(to: tempFileURL, withOptions: writeOptions)
     progressHandler(0.7)
 

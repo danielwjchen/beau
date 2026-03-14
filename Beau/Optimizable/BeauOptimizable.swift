@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 
-let appSignature = "Optimized with Beau"
+let BEAU_SIGNATURE = "Optimized with Beau"
 
 protocol BeauOptimizable: ObservableObject, Identifiable, AnyObject {
   var id: UUID { get }
@@ -39,7 +39,7 @@ extension BeauOptimizable {
   }
 
   func getProcessedOnDate(value: String) -> Date? {
-    let pieces = value.components(separatedBy: "\(appSignature):")
+    let pieces = value.components(separatedBy: "\(BEAU_SIGNATURE):")
     if pieces.count == 2 {
       let dateString = pieces[1].trimmingCharacters(in: .whitespacesAndNewlines).replacing(
         ")", with: "")
@@ -52,6 +52,6 @@ extension BeauOptimizable {
   func getSignature() -> String {
     let formatter = ISO8601DateFormatter()
     let timestamp = formatter.string(from: Date())
-    return "(\(appSignature): \(timestamp))"
+    return "(\(BEAU_SIGNATURE): \(timestamp))"
   }
 }

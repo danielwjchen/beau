@@ -72,6 +72,18 @@ class BeauVideoOptimizable: BeauOptimizable {
       }
     }
 
+    let signature = getSignature()
+    let metadataItem = AVMutableMetadataItem()
+    metadataItem.keySpace = .common
+    metadataItem.value = signature as NSString
+    metadataItem.extendedLanguageTag = "und"
+    metadataItem.key = AVMetadataKey.commonKeyDescription as NSString
+
+    let metadata = try await asset.load(.metadata)
+    var newMetadata = metadata
+    newMetadata.append(metadataItem)
+    exportSession.metadata = newMetadata
+
     // Start the export operation.
     await exportSession.export()
 

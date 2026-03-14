@@ -119,6 +119,10 @@ class BeauImageOptimizable: BeauOptimizable {
     var destinationMetadata = originalMetadata
     destinationMetadata[kCGImageDestinationLossyCompressionQuality] = quality as CFNumber
 
+    var exif = destinationMetadata[kCGImagePropertyExifDictionary] as? [String: Any] ?? [:]
+    exif[kCGImagePropertyExifUserComment as String] = getSignature()
+    destinationMetadata[kCGImagePropertyExifDictionary] = exif
+
     guard
       let destination = CGImageDestinationCreateWithURL(
         tempFileURL as CFURL,
