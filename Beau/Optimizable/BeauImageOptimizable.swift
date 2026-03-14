@@ -120,7 +120,9 @@ class BeauImageOptimizable: BeauOptimizable {
     destinationMetadata[kCGImageDestinationLossyCompressionQuality] = quality as CFNumber
 
     var exif = destinationMetadata[kCGImagePropertyExifDictionary] as? [String: Any] ?? [:]
-    exif[kCGImagePropertyExifUserComment as String] = getSignature()
+    let existing = exif[kCGImagePropertyExifUserComment as String] as? String ?? ""
+    let filtered = removeSignature(from: existing)
+    exif[kCGImagePropertyExifUserComment as String] = "\(filtered) \(getSignature())"
     destinationMetadata[kCGImagePropertyExifDictionary] = exif
 
     guard

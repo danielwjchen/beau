@@ -52,6 +52,12 @@ extension BeauOptimizable {
   func getSignature() -> String {
     let formatter = ISO8601DateFormatter()
     let timestamp = formatter.string(from: Date())
-    return "(\(BEAU_SIGNATURE): \(timestamp))"
+    return "[\(BEAU_SIGNATURE): \(timestamp)]"
+  }
+
+  func removeSignature(from input: String) -> String {
+    let pattern = "\\[\(BEAU_SIGNATURE):[^\\]]*\\]"
+    guard let regex = try? Regex(pattern) else { return input }
+    return input.replacing(regex, with: "")
   }
 }

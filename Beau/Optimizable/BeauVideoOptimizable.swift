@@ -30,9 +30,15 @@ class BeauVideoOptimizable: BeauOptimizable {
     Task {
       do {
         let metadata = try await asset.load(.metadata)
-        for item in metadata {
+        let descriptionItems = AVMetadataItem.metadataItems(
+          from: metadata,
+          filteredByIdentifier: .commonIdentifierDescription
+        )
+        for item in descriptionItems {
           guard let value = try await item.load(.value) as? String else { return }
-          self.processedOn = getProcessedOnDate(value: value)
+          if value.contains(BEAU_SIGNATURE) {
+            self.processedOn = getProcessedOnDate(value: value)
+          }
         }
       } catch {
         print("Unable to read video metadata for \(sourceURL).")
@@ -72,17 +78,33 @@ class BeauVideoOptimizable: BeauOptimizable {
       }
     }
 
+    var metadata = try await asset.load(.metadata)
     let signature = getSignature()
-    let metadataItem = AVMutableMetadataItem()
-    metadataItem.keySpace = .common
-    metadataItem.value = signature as NSString
-    metadataItem.extendedLanguageTag = "und"
-    metadataItem.key = AVMetadataKey.commonKeyDescription as NSString
-
-    let metadata = try await asset.load(.metadata)
-    var newMetadata = metadata
-    newMetadata.append(metadataItem)
-    exportSession.metadata = newMetadata
+    var replacesExisting = false
+    if let index = metadata.firstIndex(where: {
+      return $0.identifier == .commonIdentifierDescription
+    }) {
+      let existingValue = try await metadata[index].load(.value)
+      let existing = (existingValue as? String) ?? ""
+      if existing.contains(BEAU_SIGNATURE) {
+        let filtered = removeSignature(from: existing)
+        if let mutableItem = metadata[index].mutableCopy() as? AVMutableMetadataItem {
+          mutableItem.value = "\(filtered) \(signature)" as NSString
+          metadata[index] = mutableItem
+          exportSession.metadata = metadata
+          replacesExisting = true
+        }
+      }
+    }
+    if !replacesExisting {
+      let metadataItem = AVMutableMetadataItem()
+      metadataItem.keySpace = .common
+      metadataItem.value = signature as NSString
+      metadataItem.extendedLanguageTag = "und"
+      metadataItem.identifier = .commonIdentifierDescription
+      metadata.append(metadataItem)
+      exportSession.metadata = metadata
+    }
 
     // Start the export operation.
     await exportSession.export()
