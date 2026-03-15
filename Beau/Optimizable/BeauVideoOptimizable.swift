@@ -78,31 +78,28 @@ class BeauVideoOptimizable: BeauOptimizable {
       }
     }
 
-    var metadata = try await asset.load(.metadata)
+    let metadata = try await asset.load(.metadata)
+    var mutableMetadata = metadata.compactMap { $0.mutableCopy() as? AVMutableMetadataItem }
     let signature = getSignature()
     var replacesExisting = false
-    if let index = metadata.firstIndex(where: {
-      return $0.identifier == .commonIdentifierDescription
-    }) {
-      let existingValue = try await metadata[index].load(.value)
+    for item in mutableMetadata {
+      let existingValue = try await item.load(.value)
       let existing = (existingValue as? String) ?? ""
       if existing.contains(BEAU_SIGNATURE) {
         let filtered = removeSignature(from: existing)
-        if let mutableItem = metadata[index].mutableCopy() as? AVMutableMetadataItem {
-          mutableItem.value = "\(filtered) \(signature)" as NSString
-          metadata[index] = mutableItem
-          exportSession.metadata = metadata
-          replacesExisting = true
-        }
+        item.value = "\(filtered) \(signature)" as NSString
+        replacesExisting = true
       }
     }
-    if !replacesExisting {
+    if replacesExisting {
+      exportSession.metadata = mutableMetadata
+    } else {
       let metadataItem = AVMutableMetadataItem()
       metadataItem.keySpace = .common
       metadataItem.value = signature as NSString
       metadataItem.extendedLanguageTag = "und"
       metadataItem.identifier = .commonIdentifierDescription
-      metadata.append(metadataItem)
+      mutableMetadata.append(metadataItem)
       exportSession.metadata = metadata
     }
 
