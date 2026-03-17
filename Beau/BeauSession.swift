@@ -13,6 +13,8 @@ class BeauSession: ObservableObject {
   @Published var items: [any BeauOptimizable] = []
   @Published var timeBegin: Date?
   @Published var timeEnd: Date?
+  @Published var isReady: Bool = false
+  @Published var isAccessing: Bool = false
 
   init(
     resolution: String,
@@ -80,5 +82,29 @@ class BeauSession: ObservableObject {
         }
       }
     })
+  }
+
+  public func cleanUpAccess() {
+    if isAccessing {
+      if let sourceURL = sourceURL {
+        sourceURL.stopAccessingSecurityScopedResource()
+      }
+    }
+  }
+
+  public func run() {
+    timeBegin = Date()
+    isReady = false
+    Task {
+      for i in items.indices {
+        if !selectedIds.contains(items[i].id) {
+          continue
+        }
+        await processBeauOptimizable(items[i], tempFileNamePattern)
+      }
+      timeEnd = Date()
+      cleanUpAccess()
+    }
+
   }
 }

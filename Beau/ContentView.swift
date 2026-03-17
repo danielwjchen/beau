@@ -22,19 +22,9 @@ struct ContentView: View {
   )
 
   @State private var isImporterPresented: Bool = false
-  @State private var isReady: Bool = false
   @State private var selectedTargetPreset: BeauTargetPreset = .defaultValue
-  @State private var isAccessing: Bool = false
   @State public var itemProgressPercentage: Float? = nil
   @State public var itemProgressMessage: String = ""
-
-  private func cleanUpAccess() {
-    if isAccessing {
-      if let sourceURL = session.sourceURL {
-        sourceURL.stopAccessingSecurityScopedResource()
-      }
-    }
-  }
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -73,7 +63,7 @@ struct ContentView: View {
     .toolbar {
       ToolbarItemGroup(placement: .primaryAction) {
         Button("Select Folder", systemImage: "folder") {
-          isReady = false
+          session.isReady = false
           isImporterPresented = true
         }
         .labelStyle(.titleAndIcon)
@@ -86,11 +76,11 @@ struct ContentView: View {
           itemProgressMessage = ""
           session.items = []
           session.selectedIds.removeAll()
-          cleanUpAccess()
+          session.cleanUpAccess()
           switch result {
           case .success(let urls):
             if let sourceURL = urls.first {
-              self.isAccessing = sourceURL.startAccessingSecurityScopedResource()
+              session.isAccessing = sourceURL.startAccessingSecurityScopedResource()
               session.sourceURL = sourceURL
               session.targetURL = sourceURL
               let fileURLs = getFileURLs(in: sourceURL)
@@ -104,7 +94,7 @@ struct ContentView: View {
                   self.itemProgressMessage = message
                 }
                 session.setSelectedIds(selectedTargetPreset)
-                isReady = session.items.count > 0
+                session.isReady = session.items.count > 0
               }
             }
           case .failure(let error):
@@ -113,21 +103,10 @@ struct ContentView: View {
         }
         .disabled(session.timeBegin != nil && session.timeEnd == nil)
         Button("Start", systemImage: "play") {
-          session.timeBegin = Date()
-          isReady = false
-          Task {
-            for i in session.items.indices {
-              if !session.selectedIds.contains(session.items[i].id) {
-                continue
-              }
-              await processBeauOptimizable(session.items[i], session.tempFileNamePattern)
-            }
-            session.timeEnd = Date()
-            cleanUpAccess()
-          }
+          session.run()
         }
         .labelStyle(.titleAndIcon)
-        .disabled(!isReady || session.selectedIds.isEmpty)
+        .disabled(!session.isReady || session.selectedIds.isEmpty)
       }
     }
   }
