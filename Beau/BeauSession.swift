@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 class BeauSession: ObservableObject {
   var resolution: String
   var encoding: String
