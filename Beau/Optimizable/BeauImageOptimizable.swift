@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import ImageIO
 import UniformTypeIdentifiers
+import os
 
 class BeauImageOptimizable: BeauOptimizable {
 
@@ -31,14 +32,14 @@ class BeauImageOptimizable: BeauOptimizable {
       let imageData = try Data(contentsOf: sourceURL)
 
       guard let source = CGImageSourceCreateWithData(imageData as CFData, nil) else {
-        print("Unable to create image source for \(sourceURL).")
+        Logger.optimizable.error("Unable to create image source for \(sourceURL)")
         return
       }
 
       guard let metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any],
         let exif = metadata[kCGImagePropertyExifDictionary as String] as? [String: Any]
       else {
-        print("Unable to read image metadata for \(sourceURL).")
+        Logger.optimizable.error("Unable to read image metadata for \(sourceURL)")
         return
       }
 
@@ -46,7 +47,7 @@ class BeauImageOptimizable: BeauOptimizable {
         self.processedOn = getProcessedOnDate(value: comment)
       }
     } catch {
-      print("Unable to read image metadata for \(sourceURL).")
+      Logger.optimizable.error("Unable to read image metadata for \(sourceURL)")
     }
   }
 
