@@ -80,6 +80,8 @@ struct ContentView: View {
           switch result {
           case .success(let urls):
             if let sourceURL = urls.first {
+              session.timeBegin = nil
+              session.timeEnd = nil
               session.isAccessing = sourceURL.startAccessingSecurityScopedResource()
               session.sourceURL = sourceURL
               session.targetURL = sourceURL
@@ -101,12 +103,8 @@ struct ContentView: View {
             print("\(error.localizedDescription)")
           }
         }
-        .disabled(session.timeBegin != nil && session.timeEnd == nil)
-        Button("Start", systemImage: "play") {
-          session.run()
-        }
-        .labelStyle(.titleAndIcon)
-        .disabled(!session.isReady || session.selectedIds.isEmpty)
+        .disabled(session.isRunning)
+        RunButton(session: session)
       }
     }
   }

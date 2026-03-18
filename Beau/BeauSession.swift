@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 class BeauSession: ObservableObject {
   var resolution: String
   var encoding: String
@@ -55,6 +54,18 @@ class BeauSession: ObservableObject {
     self.items = []
     self.timeBegin = nil
     self.timeEnd = nil
+  }
+
+  var isRunning: Bool {
+    return timeBegin != nil && timeEnd == nil
+  }
+
+  var isDone: Bool {
+    return timeBegin != nil && timeEnd != nil
+  }
+
+  var canRun: Bool {
+    return isReady && !selectedIds.isEmpty && !isRunning
   }
 
   public func setPropertiesFromPreset(_ preset: BeauTargetPreset) {
