@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 class BeauSession: ObservableObject {
   var resolution: String
@@ -15,6 +16,21 @@ class BeauSession: ObservableObject {
   @Published var timeEnd: Date?
   @Published var isReady: Bool = false
   @Published var isAccessing: Bool = false
+  @Published var isDragging = false
+  @Published var itemProgressPercentage: Float? = nil
+  @Published public var itemProgressMessage: String = ""
+  @Environment(\.colorScheme) var colorScheme
+
+  var textColor: Color {
+    if isRunning {
+      return colorScheme == .dark ? .white : .gray
+    }
+    return colorScheme == .dark ? .white : canRun ? .white : .gray
+  }
+
+  var brandColor: Color {
+    return colorScheme == .dark ? Color.brandDark : Color.brandLight
+  }
 
   init(
     resolution: String,
@@ -100,6 +116,34 @@ class BeauSession: ObservableObject {
     if isAccessing {
       if let sourceURL = sourceURL {
         sourceURL.stopAccessingSecurityScopedResource()
+      }
+    }
+  }
+
+  public func readFiles(selectedTargetPreset: BeauTargetPreset, urls: [URL]) {
+    itemProgressPercentage = nil
+    itemProgressMessage = ""
+    items = []
+    selectedIds.removeAll()
+    cleanUpAccess()
+    if let sourceURL = urls.first {
+      timeBegin = nil
+      timeEnd = nil
+      isAccessing = sourceURL.startAccessingSecurityScopedResource()
+      self.sourceURL = sourceURL
+      targetURL = sourceURL
+      let fileURLs = getFileURLs(in: sourceURL)
+      let targetResolution = CGSize(width: 1920, height: 1080)
+      let targetEncoding = ""
+      Task {
+        items = await createBeauOptimizable(
+          fileURLs, targetResolution, targetEncoding
+        ) { progressPercentage, message in
+          self.itemProgressPercentage = progressPercentage
+          self.itemProgressMessage = message
+        }
+        setSelectedIds(selectedTargetPreset)
+        isReady = items.count > 0
       }
     }
   }

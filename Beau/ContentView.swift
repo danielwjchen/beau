@@ -23,8 +23,6 @@ struct ContentView: View {
 
   @State private var isImporterPresented: Bool = false
   @State private var selectedTargetPreset: BeauTargetPreset = .defaultValue
-  @State public var itemProgressPercentage: Float? = nil
-  @State public var itemProgressMessage: String = ""
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -47,13 +45,13 @@ struct ContentView: View {
 
       BeauSessionView(session)
       if session.sourceURL != nil && session.items.count == 0 {
-        BeauLoadingView(itemProgressMessage)
+        BeauLoadingView(session.itemProgressMessage)
           .font(.caption)
           .padding(.top, 4)
           .padding(.leading, 8)
           .padding(.trailing, 8)
           .padding(.bottom, 2)
-        ProgressView(value: itemProgressPercentage)
+        ProgressView(value: session.itemProgressPercentage)
           .padding(.top, 2)
           .padding(.leading, 8)
           .padding(.trailing, 8)
@@ -72,33 +70,9 @@ struct ContentView: View {
           allowedContentTypes: allowedContentTypes,
           allowsMultipleSelection: false
         ) { result in
-          itemProgressPercentage = nil
-          itemProgressMessage = ""
-          session.items = []
-          session.selectedIds.removeAll()
-          session.cleanUpAccess()
           switch result {
           case .success(let urls):
-            if let sourceURL = urls.first {
-              session.timeBegin = nil
-              session.timeEnd = nil
-              session.isAccessing = sourceURL.startAccessingSecurityScopedResource()
-              session.sourceURL = sourceURL
-              session.targetURL = sourceURL
-              let fileURLs = getFileURLs(in: sourceURL)
-              let targetResolution = CGSize(width: 1920, height: 1080)
-              let targetEncoding = ""
-              Task {
-                session.items = await createBeauOptimizable(
-                  fileURLs, targetResolution, targetEncoding
-                ) { progressPercentage, message in
-                  self.itemProgressPercentage = progressPercentage
-                  self.itemProgressMessage = message
-                }
-                session.setSelectedIds(selectedTargetPreset)
-                session.isReady = session.items.count > 0
-              }
-            }
+            session.readFiles(selectedTargetPreset: selectedTargetPreset, urls: urls)
           case .failure(let error):
             print("\(error.localizedDescription)")
           }
