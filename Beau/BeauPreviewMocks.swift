@@ -81,7 +81,6 @@ struct BeauPreviewMocks {
   public static func getSessionEmpty() -> BeauSession {
     let session = BeauSession(from: BeauTargetPreset.defaultValue)
     session.sourceURL = folderURL
-    session.targetURL = folderURL
     return session
   }
 

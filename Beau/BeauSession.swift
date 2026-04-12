@@ -1,4 +1,3 @@
-import Foundation
 import SwiftUI
 
 class BeauSession: ObservableObject {
@@ -8,7 +7,6 @@ class BeauSession: ObservableObject {
   var tempFileNamePattern: String
   var preservesMeta: Bool
   var sourceURL: URL?
-  var targetURL: URL?
   var preservesFolders: Bool
   @Published var selectedIds: Set<UUID> = []
   @Published var items: [any BeauOptimizable] = []
@@ -39,7 +37,6 @@ class BeauSession: ObservableObject {
     tempFileNamePattern: String = ".tmp",
     preservesMeta: Bool = true,
     sourceURL: URL? = nil,
-    targetURL: URL? = nil,
     preservesFolders: Bool = true,
     items: [any BeauOptimizable] = [],
     timeBegin: Date? = nil,
@@ -51,7 +48,6 @@ class BeauSession: ObservableObject {
     self.tempFileNamePattern = tempFileNamePattern
     self.preservesMeta = preservesMeta
     self.sourceURL = sourceURL
-    self.targetURL = targetURL
     self.preservesFolders = preservesFolders
     self.items = items
     self.timeBegin = timeBegin
@@ -65,7 +61,6 @@ class BeauSession: ObservableObject {
     self.tempFileNamePattern = ".tmp"
     self.preservesMeta = true
     self.sourceURL = nil
-    self.targetURL = nil
     self.preservesFolders = true
     self.items = []
     self.timeBegin = nil
@@ -126,13 +121,12 @@ class BeauSession: ObservableObject {
     items = []
     selectedIds.removeAll()
     cleanUpAccess()
-    if let sourceURL = urls.first {
+    if let selectedURL = urls.first {
       timeBegin = nil
       timeEnd = nil
-      isAccessing = sourceURL.startAccessingSecurityScopedResource()
-      self.sourceURL = sourceURL
-      targetURL = sourceURL
-      let fileURLs = getFileURLs(in: sourceURL)
+      isAccessing = selectedURL.startAccessingSecurityScopedResource()
+      sourceURL = selectedURL
+      let fileURLs = getFileURLs(in: selectedURL)
       let targetResolution = CGSize(width: 1920, height: 1080)
       let targetEncoding = ""
       Task {
