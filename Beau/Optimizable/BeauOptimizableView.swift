@@ -67,17 +67,17 @@ struct BeauItemView<T: BeauOptimizable>: View {
             .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
         }
         VStack(alignment: .leading) {
-          BeauBreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
+          BreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
             .padding(10)
           Spacer()
           HStack(alignment: .bottom) {
-            BeauNameAndSizeView(
+            NameAndSizeView(
               name: item.sourceURL.lastPathComponent,
               resolution: item.sourceResolution,
               fileSize: item.sourceSize
             )
             Spacer()
-            BeauNameAndSizeView(
+            NameAndSizeView(
               name: item.targetURL.lastPathComponent,
               resolution: item.targetResolution,
               fileSize: item.targetSize

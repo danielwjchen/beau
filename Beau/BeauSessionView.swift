@@ -13,7 +13,7 @@ struct BeauSessionView: View {
         HStack(alignment: .center) {
           Text("\(self.session.selectedIds.count)/\(self.session.items.count) selected")
             .font(.footnote)
-          BeauBreadcrumbPathView(url: sourceURL)
+          BreadcrumbPathView(url: sourceURL)
         }
         .padding(8)
         List(session.items, id: \.id) { item in

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BeauBreadcrumbPathView: View {
+struct BreadcrumbPathView: View {
   let url: URL
   let components: [String]
   let isICloud: Bool
@@ -49,24 +49,24 @@ struct BeauBreadcrumbPathView: View {
 }
 
 #Preview {
-  BeauBreadcrumbPathView(url: URL(string: "/home/foobar/Documents/Secrets/config.json")!)
+  BreadcrumbPathView(url: URL(string: "/home/foobar/Documents/Secrets/config.json")!)
     .padding(10)
 }
 
 #Preview("Path to Folder") {
-  BeauBreadcrumbPathView(url: URL(string: "/home/foobar/Documents/Secrets/")!)
+  BreadcrumbPathView(url: URL(string: "/home/foobar/Documents/Secrets/")!)
     .padding(10)
 }
 
 #Preview("iCloud") {
-  BeauBreadcrumbPathView(
+  BreadcrumbPathView(
     url: URL(string: "/home/foobar/Library/Mobile Documents/Secrets/config.json")!
   )
   .padding(10)
 }
 
 #Preview("iCloud Docs") {
-  BeauBreadcrumbPathView(
+  BreadcrumbPathView(
     url: URL(
       string: "/home/foobar/Library/Mobile Documents/com~apple~CloudDocs/Secrets/config.json")!
   )

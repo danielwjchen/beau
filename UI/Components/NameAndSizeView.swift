@@ -10,7 +10,7 @@ func getFileSizeString(fileSize: Int64?) -> String {
   return formatter.string(fromByteCount: fileSize)
 }
 
-struct BeauNameAndSizeView: View {
+struct NameAndSizeView: View {
   let name: String
   let resolutionString: String
   let fileSizeString: String
@@ -52,7 +52,7 @@ struct BeauNameAndSizeView: View {
 }
 
 #Preview {
-  BeauNameAndSizeView(
+  NameAndSizeView(
     name: "foobar.mov",
     resolution: CGSize(width: 1920, height: 1080),
     fileSize: 123456
