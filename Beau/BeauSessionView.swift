@@ -34,9 +34,7 @@ struct BeauSessionView: View {
           Divider()
         }
       } else {
-        Text("No source directory selected.")
-          .padding(8)
-        Spacer()
+        DropZoneView(session: session)
       }
     }
   }

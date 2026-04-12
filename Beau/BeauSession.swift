@@ -16,7 +16,8 @@ class BeauSession: ObservableObject {
   @Published var isAccessing: Bool = false
   @Published var isDragging = false
   @Published var itemProgressPercentage: Float? = nil
-  @Published public var itemProgressMessage: String = ""
+  @Published var itemProgressMessage: String = ""
+  @Published var selectedTargetPreset: BeauTargetPreset = .defaultValue
   @Environment(\.colorScheme) var colorScheme
 
   var textColor: Color {
@@ -115,7 +116,7 @@ class BeauSession: ObservableObject {
     }
   }
 
-  public func readFiles(selectedTargetPreset: BeauTargetPreset, urls: [URL]) {
+  public func readFiles(urls: [URL]) {
     itemProgressPercentage = nil
     itemProgressMessage = ""
     items = []

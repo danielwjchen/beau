@@ -50,6 +50,12 @@ struct DropZoneView: View {
         allowedContentTypes: allowedContentTypes,
         allowsMultipleSelection: false
       ) { result in
+        switch result {
+        case .success(let urls):
+          session.readFiles(urls: urls)
+        case .failure(let error):
+          print("\(error.localizedDescription)")
+        }
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)

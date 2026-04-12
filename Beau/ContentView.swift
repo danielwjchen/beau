@@ -22,23 +22,24 @@ struct ContentView: View {
   )
 
   @State private var isImporterPresented: Bool = false
-  @State private var selectedTargetPreset: BeauTargetPreset = .defaultValue
 
   var body: some View {
     VStack(alignment: .leading) {
-      Picker("Target", selection: $selectedTargetPreset) {
+      Picker("Target", selection: $session.selectedTargetPreset) {
         ForEach(BeauTargetPreset.all) { preset in
           Text(preset.label).tag(preset)
         }
       }
       .padding(.vertical, 8.0)
       .padding(.horizontal, 8.0)
-      .onChange(of: selectedTargetPreset) {
-        session.setPropertiesFromPreset(selectedTargetPreset)
-        session.setSelectedIds(selectedTargetPreset)
+      .onChange(of: session.selectedTargetPreset) {
+        session.setPropertiesFromPreset(session.selectedTargetPreset)
+        session.setSelectedIds(session.selectedTargetPreset)
         session.items.forEach { item in
           item.updateTargetResolution(
-            CGSize(width: selectedTargetPreset.width, height: selectedTargetPreset.height)
+            CGSize(
+              width: session.selectedTargetPreset.width, height: session.selectedTargetPreset.height
+            )
           )
         }
       }
@@ -72,7 +73,7 @@ struct ContentView: View {
         ) { result in
           switch result {
           case .success(let urls):
-            session.readFiles(selectedTargetPreset: selectedTargetPreset, urls: urls)
+            session.readFiles(urls: urls)
           case .failure(let error):
             print("\(error.localizedDescription)")
           }
