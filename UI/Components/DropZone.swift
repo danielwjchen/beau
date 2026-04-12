@@ -44,6 +44,7 @@ struct DropZoneView: View {
               .stroke(Color.white.opacity(0.08), lineWidth: 1)
           )
       }
+      .pointingHandCursor()
       .buttonStyle(.plain)
       .fileImporter(
         isPresented: $isImporterPresented,
