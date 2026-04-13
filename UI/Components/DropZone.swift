@@ -22,10 +22,10 @@ struct DropZoneView: View {
       VStack(spacing: 5) {
         Text("Drop files or folders here")
           .font(.system(size: 15, weight: .medium))
-          .foregroundColor(.labelPrimary.opacity(0.75))
+          .foregroundColor(session.textColor)
         Text("Supports PDF, PNG, JPG, HEIC, MP4, MOV")
           .font(.system(size: 13))
-          .foregroundColor(.labelTertiary)
+          .foregroundColor(session.textColor.opacity(0.75))
       }
 
       Button {
@@ -34,14 +34,14 @@ struct DropZoneView: View {
       } label: {
         Text("or click to select files")
           .font(.system(size: 12))
-          .foregroundColor(.labelTertiary)
+          .foregroundColor(session.textColor)
           .padding(.horizontal, 14)
           .padding(.vertical, 5)
           .background(Color.white.opacity(0.05))
           .clipShape(RoundedRectangle(cornerRadius: 6))
           .overlay(
             RoundedRectangle(cornerRadius: 6)
-              .stroke(Color.white.opacity(0.08), lineWidth: 1)
+              .stroke(session.textColor.opacity(0.75), lineWidth: 1)
           )
       }
       .pointingHandCursor()
@@ -63,7 +63,7 @@ struct DropZoneView: View {
     .background(
       RoundedRectangle(cornerRadius: 12)
         .stroke(
-          session.isDragging ? Color.brandLight : Color.white.opacity(0.1),
+          session.textColor,
           style: StrokeStyle(lineWidth: 2, dash: [6])
         )
         .background(

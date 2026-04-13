@@ -21,7 +21,7 @@ class BeauSession: ObservableObject {
   @Environment(\.colorScheme) var colorScheme
 
   var textColor: Color {
-    if isRunning {
+    if isRunning || isDragging {
       return colorScheme == .dark ? .white : .gray
     }
     return colorScheme == .dark ? .white : canRun ? .white : .gray
@@ -156,6 +156,17 @@ class BeauSession: ObservableObject {
       timeEnd = Date()
       cleanUpAccess()
     }
+  }
 
+  public func reset() {
+    timeBegin = nil
+    timeEnd = nil
+    items = []
+    selectedIds.removeAll()
+    isReady = false
+    itemProgressPercentage = nil
+    itemProgressMessage = ""
+    sourceURL = nil
+    cleanUpAccess()
   }
 }

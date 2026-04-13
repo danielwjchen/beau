@@ -61,24 +61,10 @@ struct ContentView: View {
     }
     .toolbar {
       ToolbarItemGroup(placement: .primaryAction) {
-        Button("Select Folder", systemImage: "folder") {
-          session.isReady = false
-          isImporterPresented = true
+        Button("Reset", systemImage: "arrow.2.circlepath") {
+          session.reset()
         }
-        .labelStyle(.titleAndIcon)
-        .fileImporter(
-          isPresented: $isImporterPresented,
-          allowedContentTypes: allowedContentTypes,
-          allowsMultipleSelection: false
-        ) { result in
-          switch result {
-          case .success(let urls):
-            session.readFiles(urls: urls)
-          case .failure(let error):
-            print("\(error.localizedDescription)")
-          }
-        }
-        .disabled(session.isRunning)
+        .disabled(session.isRunning || session.sourceURL == nil)
         RunButton(session: session)
       }
     }
