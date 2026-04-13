@@ -73,6 +73,9 @@ struct DropZoneView: View {
         .padding(20)
     )
     .dropDestination(for: URL.self) { urls, _ in
+      if urls.count > 1 {
+        return false
+      }
       session.readFiles(urls: urls)
       return true
     } isTargeted: { targeted in
