@@ -72,6 +72,12 @@ struct DropZoneView: View {
         )
         .padding(20)
     )
+    .dropDestination(for: URL.self) { urls, _ in
+      session.readFiles(urls: urls)
+      return true
+    } isTargeted: { targeted in
+      session.isDragging = targeted
+    }
     .animation(.easeInOut(duration: 0.15), value: session.isDragging)
   }
 }
