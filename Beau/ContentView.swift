@@ -25,24 +25,6 @@ struct ContentView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Picker("Target", selection: $session.selectedTargetPreset) {
-        ForEach(BeauTargetPreset.all) { preset in
-          Text(preset.label).tag(preset)
-        }
-      }
-      .padding(.vertical, 8.0)
-      .padding(.horizontal, 8.0)
-      .onChange(of: session.selectedTargetPreset) {
-        session.setPropertiesFromPreset(session.selectedTargetPreset)
-        session.setSelectedIds(session.selectedTargetPreset)
-        session.items.forEach { item in
-          item.updateTargetResolution(
-            CGSize(
-              width: session.selectedTargetPreset.width, height: session.selectedTargetPreset.height
-            )
-          )
-        }
-      }
 
       BeauSessionView(session)
       if session.sourceURL != nil && session.items.count == 0 {
@@ -61,6 +43,25 @@ struct ContentView: View {
     }
     .toolbar {
       ToolbarItemGroup(placement: .primaryAction) {
+        Picker("Target", selection: $session.selectedTargetPreset) {
+          ForEach(BeauTargetPreset.all) { preset in
+            Text(preset.label).tag(preset)
+          }
+        }
+        .padding(.vertical, 8.0)
+        .padding(.horizontal, 8.0)
+        .onChange(of: session.selectedTargetPreset) {
+          session.setPropertiesFromPreset(session.selectedTargetPreset)
+          session.setSelectedIds(session.selectedTargetPreset)
+          session.items.forEach { item in
+            item.updateTargetResolution(
+              CGSize(
+                width: session.selectedTargetPreset.width,
+                height: session.selectedTargetPreset.height
+              )
+            )
+          }
+        }
         Button("Reset", systemImage: "arrow.2.circlepath") {
           session.reset()
         }
