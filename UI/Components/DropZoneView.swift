@@ -32,7 +32,7 @@ struct DropZoneView: View {
         session.isReady = false
         isImporterPresented = true
       } label: {
-        Text("or click to select files")
+        Text("or click to select files or folders")
           .font(.system(size: 12))
           .foregroundColor(session.textColor)
           .padding(.horizontal, 14)
@@ -49,7 +49,7 @@ struct DropZoneView: View {
       .fileImporter(
         isPresented: $isImporterPresented,
         allowedContentTypes: allowedContentTypes,
-        allowsMultipleSelection: false
+        allowsMultipleSelection: true
       ) { result in
         switch result {
         case .success(let urls):
@@ -73,10 +73,7 @@ struct DropZoneView: View {
         .padding(20)
     )
     .dropDestination(for: URL.self) { urls, _ in
-      guard urls.count == 1,
-            let url = urls.first,
-            url.hasDirectoryPath
-      else {
+      guard !urls.isEmpty else {
         return false
       }
       session.readFiles(urls: urls)

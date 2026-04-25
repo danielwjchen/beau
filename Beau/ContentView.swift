@@ -10,9 +10,19 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 #if os(macOS)
-  let allowedContentTypes = [UTType.directory]
+  let allowedContentTypes: [UTType] = [
+    .directory,
+    .image,
+    .movie,
+    .pdf,
+  ]
 #else
-  let allowedContentTypes = [UTType.folder]
+  let allowedContentTypes: [UTType] = [
+    .folder,
+    .image,
+    .movie,
+    .pdf,
+  ]
 #endif
 
 struct ContentView: View {
@@ -27,7 +37,7 @@ struct ContentView: View {
     VStack(alignment: .leading) {
 
       BeauSessionView(session)
-      if session.sourceURL != nil && session.items.count == 0 {
+      if !session.accessedURLs.isEmpty && session.groups.count == 0 {
         BeauLoadingView(session.itemProgressMessage)
           .font(.caption)
           .padding(.top, 4)
@@ -53,19 +63,21 @@ struct ContentView: View {
         .onChange(of: session.selectedTargetPreset) {
           session.setPropertiesFromPreset(session.selectedTargetPreset)
           session.setSelectedIds(session.selectedTargetPreset)
-          session.items.forEach { item in
-            item.updateTargetResolution(
-              CGSize(
-                width: session.selectedTargetPreset.width,
-                height: session.selectedTargetPreset.height
+          session.groups.forEach { group in
+            group.items.forEach { item in
+              item.updateTargetResolution(
+                CGSize(
+                  width: session.selectedTargetPreset.width,
+                  height: session.selectedTargetPreset.height
+                )
               )
-            )
+            }
           }
         }
         Button("Reset", systemImage: "arrow.2.circlepath") {
           session.reset()
         }
-        .disabled(session.isRunning || session.sourceURL == nil)
+        .disabled(session.isRunning || session.accessedURLs.isEmpty)
         RunButton(session: session)
       }
     }

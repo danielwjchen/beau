@@ -6,11 +6,17 @@ struct BeauItemView<T: BeauOptimizable>: View {
   @Binding var selectedIds: Set<UUID>
 
   init(_ item: T, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
-    let urlString = item.sourceURL.path.replacingOccurrences(
-      of: sourceURL.path,
-      with: ""
-    )
-    self.relativeURL = URL(fileURLWithPath: urlString).deletingLastPathComponent()
+    let itemParentURL = item.sourceURL.deletingLastPathComponent()
+    if itemParentURL.path.hasPrefix(sourceURL.path) {
+      let relativePath = String(itemParentURL.path.dropFirst(sourceURL.path.count))
+      if relativePath.isEmpty {
+        self.relativeURL = itemParentURL
+      } else {
+        self.relativeURL = URL(fileURLWithPath: relativePath)
+      }
+    } else {
+      self.relativeURL = itemParentURL
+    }
     self.item = item
     self._selectedIds = selectedIds
   }

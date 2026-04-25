@@ -9,28 +9,14 @@ struct BeauSessionView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      if let sourceURL = session.sourceURL {
-        HStack(alignment: .center) {
-          Text("\(self.session.selectedIds.count)/\(self.session.items.count) selected")
-            .font(.footnote)
-          BreadcrumbPathView(url: sourceURL)
-        }
-        .padding(8)
-        List(session.items, id: \.id) { item in
-          // Type erasure to determine the concrete type of BeauMediaOptimizable
-          if let videoItem = item as? BeauVideoOptimizable {
-            BeauItemView(videoItem, sourceURL, $session.selectedIds)
-              .listRowSeparator(.hidden)
-          } else if let imageItem = item as? BeauImageOptimizable {
-            BeauItemView(imageItem, sourceURL, $session.selectedIds)
-              .listRowSeparator(.hidden)
-          } else if let pdfItem = item as? BeauPDFOptimizable {
-            BeauItemView(pdfItem, sourceURL, $session.selectedIds)
-              .listRowSeparator(.hidden)
-          } else {
-            Text("Unsupported item type")
-              .listRowSeparator(.hidden)
-          }
+      if !session.accessedURLs.isEmpty {
+        Text("\(self.session.selectedIds.count)/\(self.session.itemCount) selected")
+          .font(.footnote)
+        List(session.groups, id: \.id) { group in
+          BeauOptimizableGroupView(
+            group: group,
+            selectedIds: $session.selectedIds
+          )
           Divider()
         }
       } else {

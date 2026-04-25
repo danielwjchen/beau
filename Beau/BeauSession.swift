@@ -6,10 +6,10 @@ class BeauSession: ObservableObject {
   var renamePattern: String
   var tempFileNamePattern: String
   var preservesMeta: Bool
-  var sourceURL: URL?
+  var accessedURLs: [URL] = []
   var preservesFolders: Bool
   @Published var selectedIds: Set<UUID> = []
-  @Published var items: [any BeauOptimizable] = []
+  @Published var groups: [BeauOptimizableGroup] = []
   @Published var timeBegin: Date?
   @Published var timeEnd: Date?
   @Published var isReady: Bool = false
@@ -31,15 +31,17 @@ class BeauSession: ObservableObject {
     return colorScheme == .dark ? Color.brandDark : Color.brandLight
   }
 
+  var itemCount: Int {
+    return groups.reduce(0) { $0 + $1.items.count }
+  }
+
   init(
     resolution: String,
     encoding: String,
     renamePattern: String = "",
     tempFileNamePattern: String = ".tmp",
     preservesMeta: Bool = true,
-    sourceURL: URL? = nil,
     preservesFolders: Bool = true,
-    items: [any BeauOptimizable] = [],
     timeBegin: Date? = nil,
     timeEnd: Date? = nil
   ) {
@@ -48,9 +50,8 @@ class BeauSession: ObservableObject {
     self.renamePattern = renamePattern
     self.tempFileNamePattern = tempFileNamePattern
     self.preservesMeta = preservesMeta
-    self.sourceURL = sourceURL
     self.preservesFolders = preservesFolders
-    self.items = items
+    self.groups = []
     self.timeBegin = timeBegin
     self.timeEnd = timeEnd
   }
@@ -61,9 +62,8 @@ class BeauSession: ObservableObject {
     self.renamePattern = ""
     self.tempFileNamePattern = ".tmp"
     self.preservesMeta = true
-    self.sourceURL = nil
     self.preservesFolders = true
-    self.items = []
+    self.groups = []
     self.timeBegin = nil
     self.timeEnd = nil
   }
@@ -89,57 +89,76 @@ class BeauSession: ObservableObject {
     _ preset: BeauTargetPreset
   ) {
     self.selectedIds.removeAll()
-    self.items.forEach({ item in
-      if item.processedOn != nil {
-        return
-      }
-      if let width = item.sourceResolution?.width,
-        let height = item.sourceResolution?.height
-      {
-        if (width > preset.width
-          && height > preset.height)
-          || (height > preset.width
-            && width > preset.height)
-          || type(of: item) == BeauPDFOptimizable.self
+    self.groups.forEach { group in
+      group.items.forEach { item in
+        if item.processedOn != nil {
+          return
+        }
+        if let width = item.sourceResolution?.width,
+          let height = item.sourceResolution?.height
         {
-          self.selectedIds.insert(item.id)
+          if (width > preset.width
+            && height > preset.height)
+            || (height > preset.width
+              && width > preset.height)
+            || type(of: item) == BeauPDFOptimizable.self
+          {
+            self.selectedIds.insert(item.id)
+          }
         }
       }
-    })
+    }
   }
 
   public func cleanUpAccess() {
     if isAccessing {
-      if let sourceURL = sourceURL {
-        sourceURL.stopAccessingSecurityScopedResource()
+      for url in accessedURLs {
+        url.stopAccessingSecurityScopedResource()
       }
+      accessedURLs = []
+      isAccessing = false
     }
   }
 
   public func readFiles(urls: [URL]) {
     itemProgressPercentage = nil
     itemProgressMessage = ""
-    items = []
+    groups = []
     selectedIds.removeAll()
     cleanUpAccess()
-    if let selectedURL = urls.first {
-      timeBegin = nil
-      timeEnd = nil
-      isAccessing = selectedURL.startAccessingSecurityScopedResource()
-      sourceURL = selectedURL
-      let fileURLs = getFileURLs(in: selectedURL)
-      let targetResolution = CGSize(width: 1920, height: 1080)
-      let targetEncoding = ""
-      Task {
-        items = await createBeauOptimizable(
-          fileURLs, targetResolution, targetEncoding
-        ) { progressPercentage, message in
-          self.itemProgressPercentage = progressPercentage
-          self.itemProgressMessage = message
-        }
-        setSelectedIds(selectedTargetPreset)
-        isReady = items.count > 0
+    guard !urls.isEmpty else { return }
+
+    timeBegin = nil
+    timeEnd = nil
+
+    var fileURLs: [URL] = []
+    for url in urls {
+      if url.startAccessingSecurityScopedResource() {
+        accessedURLs.append(url)
+        isAccessing = true
       }
+
+      if url.hasDirectoryPath {
+        fileURLs += getFileURLs(in: url)
+      } else {
+        fileURLs.append(url)
+      }
+    }
+
+    let targetResolution = CGSize(width: 1920, height: 1080)
+    let targetEncoding = ""
+    Task {
+      let items = await createBeauOptimizable(
+        fileURLs, targetResolution, targetEncoding
+      ) { progressPercentage, message in
+        self.itemProgressPercentage = progressPercentage
+        self.itemProgressMessage = message
+      }
+      setSelectedIds(selectedTargetPreset)
+      self.groups = groupOptimizablesByFolder(items).map { folder, items in
+        BeauOptimizableGroup(url: folder, items: items)
+      }
+      isReady = items.count > 0
     }
   }
 
@@ -147,11 +166,13 @@ class BeauSession: ObservableObject {
     timeBegin = Date()
     isReady = false
     Task {
-      for i in items.indices {
-        if !selectedIds.contains(items[i].id) {
-          continue
+      for g in groups.indices {
+        for i in groups[g].items.indices {
+          if !selectedIds.contains(groups[g].items[i].id) {
+            continue
+          }
+          await processBeauOptimizable(groups[g].items[i], tempFileNamePattern)
         }
-        await processBeauOptimizable(items[i], tempFileNamePattern)
       }
       timeEnd = Date()
       cleanUpAccess()
@@ -161,12 +182,11 @@ class BeauSession: ObservableObject {
   public func reset() {
     timeBegin = nil
     timeEnd = nil
-    items = []
+    groups = []
     selectedIds.removeAll()
     isReady = false
     itemProgressPercentage = nil
     itemProgressMessage = ""
-    sourceURL = nil
     cleanUpAccess()
   }
 }

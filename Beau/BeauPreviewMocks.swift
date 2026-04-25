@@ -60,27 +60,31 @@ struct BeauPreviewMocks {
     let imageItem = getImageOptimizableSuccessful()
     let errorItem = getImageOptimizableWithError()
 
-    session.items = [isSelectedItem, videoItem, imageItem, errorItem]
+    session.groups = [
+      BeauOptimizableGroup(
+        url: URL(fileURLWithPath: "/path/to/folder"),
+        items: [isSelectedItem, videoItem, imageItem, errorItem]
+      )
+    ]
     return session
   }
 
   public static func getSessionWithSelectedItems() -> BeauSession {
     let session = getSessionWithItems()
     session.isReady = true
-    session.selectedIds = [session.items[0].id, session.items[2].id]
+    session.selectedIds = [session.groups[0].items[0].id, session.groups[0].items[2].id]
     return session
   }
 
   public static func getSessionWithSelectedItemsProcessing() -> BeauSession {
     let session = getSessionWithItems()
-    session.selectedIds = [session.items[0].id, session.items[2].id]
+    session.selectedIds = [session.groups[0].items[0].id, session.groups[0].items[2].id]
     session.timeBegin = Date()
     return session
   }
 
   public static func getSessionEmpty() -> BeauSession {
     let session = BeauSession(from: BeauTargetPreset.defaultValue)
-    session.sourceURL = folderURL
     return session
   }
 

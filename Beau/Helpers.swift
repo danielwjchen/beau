@@ -236,3 +236,7 @@ func getBeauMediaOptimizableType(for url: URL) -> (any BeauOptimizable.Type)? {
   }
   return nil
 }
+
+func groupOptimizablesByFolder(_ items: [any BeauOptimizable]) -> [URL: [any BeauOptimizable]] {
+  Dictionary(grouping: items, by: { $0.sourceURL.deletingLastPathComponent() })
+}
