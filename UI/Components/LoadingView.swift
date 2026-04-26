@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BeauLoadingView: View {
+struct LoadingView: View {
   let baseText: String
   let maxDots: Int
   let speed: Double  // dots per second
@@ -27,7 +27,7 @@ struct BeauLoadingView: View {
 }
 
 #Preview {
-  BeauLoadingView("Loading")
+  LoadingView("Loading")
     .padding(10)
     .frame(minWidth: 100)
 }

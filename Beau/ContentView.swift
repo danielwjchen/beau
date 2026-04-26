@@ -36,7 +36,7 @@ struct ContentView: View {
 
       SessionView(session)
       if session.isRunning {
-        BeauLoadingView(session.itemProgressMessage)
+        LoadingView(session.itemProgressMessage)
           .font(.caption)
           .padding(.top, 4)
           .padding(.leading, 8)
