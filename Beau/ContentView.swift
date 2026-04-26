@@ -31,8 +31,6 @@ struct ContentView: View {
     from: BeauTargetPreset.defaultValue
   )
 
-  @State private var isImporterPresented: Bool = false
-
   var body: some View {
     VStack(alignment: .leading) {
 
