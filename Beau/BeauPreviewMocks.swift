@@ -53,18 +53,22 @@ struct BeauPreviewMocks {
     return item
   }
 
-  public static func getSessionWithItems() -> BeauSession {
-    let session = getSessionEmpty()
+  public static func getGroupWithItems() -> BeauOptimizableGroup {
     let isSelectedItem = getVideoOptimizableIsSelected()
     let videoItem = getVideoOptimizableInProgress()
     let imageItem = getImageOptimizableSuccessful()
     let errorItem = getImageOptimizableWithError()
 
+    return BeauOptimizableGroup(
+      url: URL(fileURLWithPath: "/path/to/folder"),
+      items: [isSelectedItem, videoItem, imageItem, errorItem]
+    )
+  }
+
+  public static func getSessionWithItems() -> BeauSession {
+    let session = getSessionEmpty()
     session.groups = [
-      BeauOptimizableGroup(
-        url: URL(fileURLWithPath: "/path/to/folder"),
-        items: [isSelectedItem, videoItem, imageItem, errorItem]
-      )
+      getGroupWithItems()
     ]
     return session
   }

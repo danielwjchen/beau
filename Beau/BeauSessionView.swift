@@ -9,7 +9,7 @@ struct BeauSessionView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      if !session.accessedURLs.isEmpty {
+      if !session.groups.isEmpty {
         Text("\(self.session.selectedIds.count)/\(self.session.itemCount) selected")
           .font(.footnote)
         List(session.groups, id: \.id) { group in
@@ -17,7 +17,7 @@ struct BeauSessionView: View {
             group: group,
             selectedIds: $session.selectedIds
           )
-          Divider()
+          .listRowSeparator(.hidden)
         }
       } else {
         DropZoneView(session: session)

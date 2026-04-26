@@ -1,22 +1,16 @@
 import SwiftUI
 
-struct BeauItemView<T: BeauOptimizable>: View {
-  @ObservedObject var item: T
+struct BeauOptimizableView: View {
+  let item: any BeauOptimizable
   let relativeURL: URL
   @Binding var selectedIds: Set<UUID>
 
-  init(_ item: T, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
-    let itemParentURL = item.sourceURL.deletingLastPathComponent()
-    if itemParentURL.path.hasPrefix(sourceURL.path) {
-      let relativePath = String(itemParentURL.path.dropFirst(sourceURL.path.count))
-      if relativePath.isEmpty {
-        self.relativeURL = itemParentURL
-      } else {
-        self.relativeURL = URL(fileURLWithPath: relativePath)
-      }
-    } else {
-      self.relativeURL = itemParentURL
-    }
+  init(_ item: any BeauOptimizable, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
+    let urlString = item.sourceURL.path.replacingOccurrences(
+      of: sourceURL.path,
+      with: ""
+    )
+    self.relativeURL = URL(fileURLWithPath: urlString).deletingLastPathComponent()
     self.item = item
     self._selectedIds = selectedIds
   }
@@ -73,9 +67,6 @@ struct BeauItemView<T: BeauOptimizable>: View {
             .opacity(isSelected.wrappedValue ? 1 : 0.5).frame(maxWidth: 100)
         }
         VStack(alignment: .leading) {
-          BreadcrumbPathView(url: relativeURL, hasLeadingChevron: true)
-            .padding(10)
-          Spacer()
           HStack(alignment: .bottom) {
             NameAndSizeView(
               name: item.sourceURL.lastPathComponent,
@@ -109,7 +100,7 @@ struct BeauItemView<T: BeauOptimizable>: View {
   @Previewable @State var selectedIds: Set<UUID> = [
     BeauPreviewMocks.getVideoOptimizableIsSelected().id
   ]
-  BeauItemView(
+  BeauOptimizableView(
     BeauPreviewMocks.getVideoOptimizableIsSelected(),
     BeauPreviewMocks.folderURL,
     $selectedIds
@@ -121,7 +112,7 @@ struct BeauItemView<T: BeauOptimizable>: View {
   @Previewable @State var selectedIds: Set<UUID> = [
     BeauPreviewMocks.getImageOptimizableSuccessful().id
   ]
-  BeauItemView(
+  BeauOptimizableView(
     BeauPreviewMocks.getImageOptimizableSuccessful(),
     BeauPreviewMocks.folderURL,
     $selectedIds
@@ -133,7 +124,7 @@ struct BeauItemView<T: BeauOptimizable>: View {
   @Previewable @State var selectedIds: Set<UUID> = [
     BeauPreviewMocks.getImageOptimizableWithError().id
   ]
-  BeauItemView(
+  BeauOptimizableView(
     BeauPreviewMocks.getImageOptimizableWithError(),
     BeauPreviewMocks.folderURL,
     $selectedIds

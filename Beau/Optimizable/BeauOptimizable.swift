@@ -3,7 +3,7 @@ import Foundation
 
 let BEAU_SIGNATURE = "Optimized with Beau"
 
-protocol BeauOptimizable: ObservableObject, Identifiable, AnyObject {
+protocol BeauOptimizable: ObservableObject, Identifiable {
   var id: UUID { get }
   var timeBegin: Date? { get set }
   var timeEnd: Date? { get set }
