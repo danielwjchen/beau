@@ -4,8 +4,8 @@ struct BeauPreviewMocks {
 
   static let folderURL = URL(fileURLWithPath: "/path/to/folder")
 
-  public static func getVideoOptimizableIsSelected() -> BeauVideoOptimizable {
-    let item = BeauVideoOptimizable(sourceURL: URL(fileURLWithPath: "/path/to/folder/video.mp4"))
+  public static func getVideoOptimizableIsSelected() -> VideoOptimizable {
+    let item = VideoOptimizable(sourceURL: URL(fileURLWithPath: "/path/to/folder/video.mp4"))
     item.timeBegin = Date()
     item.sourceResolution = CGSize(width: 1920, height: 1080)
     item.targetResolution = CGSize(width: 1280, height: 720)
@@ -16,8 +16,8 @@ struct BeauPreviewMocks {
     return item
   }
 
-  public static func getVideoOptimizableInProgress() -> BeauVideoOptimizable {
-    let item = BeauVideoOptimizable(
+  public static func getVideoOptimizableInProgress() -> VideoOptimizable {
+    let item = VideoOptimizable(
       sourceURL: URL(fileURLWithPath: "/path/to/folder/2025-12-01/video.mp4"))
     item.timeBegin = Date()
     item.sourceResolution = CGSize(width: 1920, height: 1080)
@@ -30,8 +30,8 @@ struct BeauPreviewMocks {
     return item
   }
 
-  public static func getImageOptimizableSuccessful() -> BeauImageOptimizable {
-    let item = BeauImageOptimizable(
+  public static func getImageOptimizableSuccessful() -> ImageOptimizable {
+    let item = ImageOptimizable(
       sourceURL: URL(fileURLWithPath: "/path/to/folder/2025-12-02/image.jpg"))
     item.sourceResolution = CGSize(width: 4000, height: 3000)
     item.targetResolution = CGSize(width: 1920, height: 1440)
@@ -42,8 +42,8 @@ struct BeauPreviewMocks {
     return item
   }
 
-  public static func getImageOptimizableWithError() -> BeauImageOptimizable {
-    let item = BeauImageOptimizable(
+  public static func getImageOptimizableWithError() -> ImageOptimizable {
+    let item = ImageOptimizable(
       sourceURL: URL(fileURLWithPath: "/path/to/folder/2025-12-03/image.png"))
     item.sourceResolution = CGSize(width: 4000, height: 3000)
     item.targetResolution = CGSize(width: 1920, height: 1440)
@@ -53,19 +53,19 @@ struct BeauPreviewMocks {
     return item
   }
 
-  public static func getGroupWithItems() -> BeauOptimizableGroup {
+  public static func getGroupWithItems() -> OptimizableGroup {
     let isSelectedItem = getVideoOptimizableIsSelected()
     let videoItem = getVideoOptimizableInProgress()
     let imageItem = getImageOptimizableSuccessful()
     let errorItem = getImageOptimizableWithError()
 
-    return BeauOptimizableGroup(
+    return OptimizableGroup(
       url: URL(fileURLWithPath: "/path/to/folder"),
       items: [isSelectedItem, videoItem, imageItem, errorItem]
     )
   }
 
-  public static func getSessionWithItems() -> BeauSession {
+  public static func getSessionWithItems() -> Session {
     let session = getSessionEmpty()
     session.groups = [
       getGroupWithItems()
@@ -73,22 +73,22 @@ struct BeauPreviewMocks {
     return session
   }
 
-  public static func getSessionWithSelectedItems() -> BeauSession {
+  public static func getSessionWithSelectedItems() -> Session {
     let session = getSessionWithItems()
     session.isReady = true
     session.selectedIds = [session.groups[0].items[0].id, session.groups[0].items[2].id]
     return session
   }
 
-  public static func getSessionWithSelectedItemsProcessing() -> BeauSession {
+  public static func getSessionWithSelectedItemsProcessing() -> Session {
     let session = getSessionWithItems()
     session.selectedIds = [session.groups[0].items[0].id, session.groups[0].items[2].id]
     session.timeBegin = Date()
     return session
   }
 
-  public static func getSessionEmpty() -> BeauSession {
-    let session = BeauSession(from: BeauTargetPreset.defaultValue)
+  public static func getSessionEmpty() -> Session {
+    let session = Session(from: BeauTargetPreset.defaultValue)
     return session
   }
 

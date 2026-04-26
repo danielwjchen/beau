@@ -3,7 +3,7 @@ import Foundation
 
 let BEAU_SIGNATURE = "Optimized with Beau"
 
-protocol BeauOptimizable: ObservableObject, Identifiable {
+protocol Optimizable: ObservableObject, Identifiable {
   var id: UUID { get }
   var timeBegin: Date? { get set }
   var timeEnd: Date? { get set }
@@ -27,7 +27,7 @@ protocol BeauOptimizable: ObservableObject, Identifiable {
   static func getDimensions(from url: URL) async throws -> CGSize
 }
 
-extension BeauOptimizable {
+extension Optimizable {
   func updateTargetResolution(_ targetResolution: CGSize) {
     let maxTargetDimension = max(targetResolution.width, targetResolution.height)
     let maxSourceDimension = max(sourceResolution?.width ?? 0, sourceResolution?.height ?? 0)

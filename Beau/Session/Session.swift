@@ -1,6 +1,6 @@
 import SwiftUI
 
-class BeauSession: ObservableObject {
+class Session: ObservableObject {
   var resolution: String
   var encoding: String
   var renamePattern: String
@@ -9,7 +9,7 @@ class BeauSession: ObservableObject {
   var accessedURLs: [URL] = []
   var preservesFolders: Bool
   @Published var selectedIds: Set<UUID> = []
-  @Published var groups: [BeauOptimizableGroup] = []
+  @Published var groups: [OptimizableGroup] = []
   @Published var timeBegin: Date?
   @Published var timeEnd: Date?
   @Published var isReady: Bool = false
@@ -98,7 +98,7 @@ class BeauSession: ObservableObject {
             && height > preset.height)
             || (height > preset.width
               && width > preset.height)
-            || type(of: item) == BeauPDFOptimizable.self
+            || type(of: item) == PDFOptimizable.self
           {
             self.selectedIds.insert(item.id)
           }
@@ -146,14 +146,14 @@ class BeauSession: ObservableObject {
     let targetResolution = CGSize(width: 1920, height: 1080)
     let targetEncoding = ""
     Task {
-      let items = await createBeauOptimizable(
+      let items = await createOptimizable(
         fileURLs, targetResolution, targetEncoding
       ) { progressPercentage, message in
         self.itemProgressPercentage = progressPercentage
         self.itemProgressMessage = message
       }
       self.groups = groupOptimizablesByFolder(items).map { folder, items in
-        BeauOptimizableGroup(url: folder, items: items)
+        OptimizableGroup(url: folder, items: items)
       }
       setSelectedIds(selectedTargetPreset)
       isReady = items.count > 0
@@ -171,7 +171,7 @@ class BeauSession: ObservableObject {
           if !selectedIds.contains(groups[g].items[i].id) {
             continue
           }
-          await processBeauOptimizable(groups[g].items[i], tempFileNamePattern)
+          await processOptimizable(groups[g].items[i], tempFileNamePattern)
         }
       }
       timeEnd = Date()

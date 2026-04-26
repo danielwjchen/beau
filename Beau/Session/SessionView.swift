@@ -1,9 +1,9 @@
 import SwiftUI
 
-struct BeauSessionView: View {
-  @ObservedObject var session: BeauSession
+struct SessionView: View {
+  @ObservedObject var session: Session
 
-  init(_ session: BeauSession) {
+  init(_ session: Session) {
     self.session = session
   }
 
@@ -16,7 +16,7 @@ struct BeauSessionView: View {
           .padding(.top, 8)
           .padding(.bottom, 2)
         List(session.groups, id: \.id) { group in
-          BeauOptimizableGroupView(
+          OptimizableGroupView(
             group: group,
             selectedIds: $session.selectedIds
           )
@@ -30,9 +30,9 @@ struct BeauSessionView: View {
 }
 
 #Preview("Empty Session") {
-  BeauSessionView(BeauPreviewMocks.getSessionEmpty())
+  SessionView(BeauPreviewMocks.getSessionEmpty())
 }
 
 #Preview("With Items") {
-  BeauSessionView(BeauPreviewMocks.getSessionWithItems())
+  SessionView(BeauPreviewMocks.getSessionWithItems())
 }

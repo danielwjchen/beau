@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct BeauOptimizableGroupView: View {
+struct OptimizableGroupView: View {
 
-  let group: BeauOptimizableGroup
+  let group: OptimizableGroup
   @Binding var selectedIds: Set<UUID>
   @Environment(\.colorScheme) var colorScheme
   var textColor: Color {
@@ -21,7 +21,7 @@ struct BeauOptimizableGroupView: View {
         BreadcrumbPathView(url: group.url)
       }
       ForEach(Array(group.items.enumerated()), id: \.element.id) { index, item in
-        BeauOptimizableView(item, group.url, $selectedIds)
+        OptimizableView(item, group.url, $selectedIds)
           .background(index % 2 == 0 ? Color.gray.opacity(0.1) : Color.clear)
           .listRowSeparator(.hidden)
       }
@@ -30,7 +30,7 @@ struct BeauOptimizableGroupView: View {
 }
 
 #Preview {
-  BeauOptimizableGroupView(
+  OptimizableGroupView(
     group: BeauPreviewMocks.getGroupWithItems(),
     selectedIds: .constant([])
   )

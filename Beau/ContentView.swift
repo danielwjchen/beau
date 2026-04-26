@@ -27,14 +27,14 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
 
-  @StateObject private var session = BeauSession(
+  @StateObject private var session = Session(
     from: BeauTargetPreset.defaultValue
   )
 
   var body: some View {
     VStack(alignment: .leading) {
 
-      BeauSessionView(session)
+      SessionView(session)
       if session.isRunning {
         BeauLoadingView(session.itemProgressMessage)
           .font(.caption)

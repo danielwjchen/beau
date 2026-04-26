@@ -2,7 +2,7 @@ import SwiftUI
 
 struct DropZoneView: View {
 
-  @ObservedObject var session: BeauSession
+  @ObservedObject var session: Session
   @State private var isImporterPresented: Bool = false
 
   var body: some View {

@@ -1,7 +1,7 @@
 import AVFoundation
 import Foundation
 
-class BeauVideoOptimizable: BeauOptimizable {
+class VideoOptimizable: Optimizable {
 
   let id = UUID()
   var sourceURL: URL

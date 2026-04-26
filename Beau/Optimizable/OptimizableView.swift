@@ -1,11 +1,11 @@
 import SwiftUI
 
-struct BeauOptimizableView: View {
-  let item: any BeauOptimizable
+struct OptimizableView: View {
+  let item: any Optimizable
   let relativeURL: URL
   @Binding var selectedIds: Set<UUID>
 
-  init(_ item: any BeauOptimizable, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
+  init(_ item: any Optimizable, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
     let urlString = item.sourceURL.path.replacingOccurrences(
       of: sourceURL.path,
       with: ""
@@ -100,7 +100,7 @@ struct BeauOptimizableView: View {
   @Previewable @State var selectedIds: Set<UUID> = [
     BeauPreviewMocks.getVideoOptimizableIsSelected().id
   ]
-  BeauOptimizableView(
+  OptimizableView(
     BeauPreviewMocks.getVideoOptimizableIsSelected(),
     BeauPreviewMocks.folderURL,
     $selectedIds
@@ -112,7 +112,7 @@ struct BeauOptimizableView: View {
   @Previewable @State var selectedIds: Set<UUID> = [
     BeauPreviewMocks.getImageOptimizableSuccessful().id
   ]
-  BeauOptimizableView(
+  OptimizableView(
     BeauPreviewMocks.getImageOptimizableSuccessful(),
     BeauPreviewMocks.folderURL,
     $selectedIds
@@ -124,7 +124,7 @@ struct BeauOptimizableView: View {
   @Previewable @State var selectedIds: Set<UUID> = [
     BeauPreviewMocks.getImageOptimizableWithError().id
   ]
-  BeauOptimizableView(
+  OptimizableView(
     BeauPreviewMocks.getImageOptimizableWithError(),
     BeauPreviewMocks.folderURL,
     $selectedIds

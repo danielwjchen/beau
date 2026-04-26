@@ -2,7 +2,7 @@ import SwiftUI
 
 struct RunButton: View {
 
-  @ObservedObject var session: BeauSession
+  @ObservedObject var session: Session
   @State private var isHovered = false
 
   var body: some View {

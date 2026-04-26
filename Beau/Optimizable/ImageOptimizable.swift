@@ -4,7 +4,7 @@ import ImageIO
 import UniformTypeIdentifiers
 import os
 
-class BeauImageOptimizable: BeauOptimizable {
+class ImageOptimizable: Optimizable {
 
   let id = UUID()
   var sourceURL: URL

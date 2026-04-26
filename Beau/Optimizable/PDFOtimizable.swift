@@ -4,7 +4,7 @@ import Quartz
 
 let QUARTZ_FILETER_PATH = "/System/Library/Filters/Reduce File Size.qfilter"
 
-class BeauPDFOptimizable: BeauOptimizable {
+class PDFOptimizable: Optimizable {
 
   let id = UUID()
   var sourceURL: URL

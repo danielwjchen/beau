@@ -63,13 +63,13 @@ func getFileSize(at url: URL) throws -> Int64? {
   return attributes[.size] as? Int64
 }
 
-func createBeauOptimizable(
+func createOptimizable(
   _ fileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
   progressStep: Float = 0.9,
   progressHandler: @escaping (Float, String) -> Void
-) async -> [any BeauOptimizable] {
+) async -> [any Optimizable] {
   let thumbnailSize: CGSize = CGSize(width: 100, height: 100)
-  var result: [any BeauOptimizable] = []
+  var result: [any Optimizable] = []
   progressHandler(0, "Loading files")
   for (index, fileURL) in fileURLs.enumerated() {
     let itemNumber = index + 1
@@ -187,8 +187,8 @@ func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
   #endif
 }
 
-func processBeauOptimizable(
-  _ item: any BeauOptimizable, _ tempFileNamePattern: String
+func processOptimizable(
+  _ item: any Optimizable, _ tempFileNamePattern: String
 ) async {
   item.completionPercentage = 0
   do {
@@ -220,15 +220,15 @@ func processBeauOptimizable(
   item.timeEnd = Date()
 }
 
-func getBeauMediaOptimizableType(for url: URL) -> (any BeauOptimizable.Type)? {
+func getBeauMediaOptimizableType(for url: URL) -> (any Optimizable.Type)? {
   do {
     if let contentType = try url.resourceValues(forKeys: [.contentTypeKey]).contentType {
       if contentType.conforms(to: .movie) || contentType.conforms(to: .video) {
-        return BeauVideoOptimizable.self
+        return VideoOptimizable.self
       } else if contentType.conforms(to: .image) {
-        return BeauImageOptimizable.self
+        return ImageOptimizable.self
       } else if contentType.conforms(to: .pdf) {
-        return BeauPDFOptimizable.self
+        return PDFOptimizable.self
       }
     }
   } catch {
@@ -237,6 +237,6 @@ func getBeauMediaOptimizableType(for url: URL) -> (any BeauOptimizable.Type)? {
   return nil
 }
 
-func groupOptimizablesByFolder(_ items: [any BeauOptimizable]) -> [URL: [any BeauOptimizable]] {
+func groupOptimizablesByFolder(_ items: [any Optimizable]) -> [URL: [any Optimizable]] {
   Dictionary(grouping: items, by: { $0.sourceURL.deletingLastPathComponent() })
 }
