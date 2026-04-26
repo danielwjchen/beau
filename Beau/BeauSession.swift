@@ -18,6 +18,7 @@ class BeauSession: ObservableObject {
   @Published var itemProgressPercentage: Float? = nil
   @Published var itemProgressMessage: String = ""
   @Published var selectedTargetPreset: BeauTargetPreset = .defaultValue
+  @Published var isRunning: Bool = false
   @Environment(\.colorScheme) var colorScheme
 
   var textColor: Color {
@@ -66,10 +67,6 @@ class BeauSession: ObservableObject {
     self.groups = []
     self.timeBegin = nil
     self.timeEnd = nil
-  }
-
-  var isRunning: Bool {
-    return timeBegin != nil && timeEnd == nil
   }
 
   var isDone: Bool {
@@ -124,6 +121,7 @@ class BeauSession: ObservableObject {
     itemProgressPercentage = nil
     itemProgressMessage = ""
     groups = []
+    isRunning = true
     selectedIds.removeAll()
     cleanUpAccess()
     guard !urls.isEmpty else { return }
@@ -159,12 +157,14 @@ class BeauSession: ObservableObject {
       }
       setSelectedIds(selectedTargetPreset)
       isReady = items.count > 0
+      isRunning = false
     }
   }
 
   public func run() {
     timeBegin = Date()
     isReady = false
+    isRunning = true
     Task {
       for g in groups.indices {
         for i in groups[g].items.indices {
@@ -176,6 +176,7 @@ class BeauSession: ObservableObject {
       }
       timeEnd = Date()
       cleanUpAccess()
+      isRunning = false
     }
   }
 
@@ -187,6 +188,7 @@ class BeauSession: ObservableObject {
     isReady = false
     itemProgressPercentage = nil
     itemProgressMessage = ""
+    isRunning = false
     cleanUpAccess()
   }
 }

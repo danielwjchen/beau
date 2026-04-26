@@ -37,7 +37,7 @@ struct ContentView: View {
     VStack(alignment: .leading) {
 
       BeauSessionView(session)
-      if !session.accessedURLs.isEmpty && session.groups.count == 0 {
+      if session.isRunning {
         BeauLoadingView(session.itemProgressMessage)
           .font(.caption)
           .padding(.top, 4)
