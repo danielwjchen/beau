@@ -154,10 +154,10 @@ class BeauSession: ObservableObject {
         self.itemProgressPercentage = progressPercentage
         self.itemProgressMessage = message
       }
-      setSelectedIds(selectedTargetPreset)
       self.groups = groupOptimizablesByFolder(items).map { folder, items in
         BeauOptimizableGroup(url: folder, items: items)
       }
+      setSelectedIds(selectedTargetPreset)
       isReady = items.count > 0
     }
   }
