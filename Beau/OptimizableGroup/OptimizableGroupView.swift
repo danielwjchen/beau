@@ -12,8 +12,9 @@ struct BeauOptimizableGroupView: View {
   var body: some View {
     VStack(alignment: .leading) {
       BreadcrumbPathView(url: group.url)
-      ForEach(group.items, id: \.id) { item in
+      ForEach(Array(group.items.enumerated()), id: \.element.id) { index, item in
         BeauOptimizableView(item, group.url, $selectedIds)
+          .background(index % 2 == 0 ? Color.gray.opacity(0.1) : Color.clear)
           .listRowSeparator(.hidden)
       }
     }
