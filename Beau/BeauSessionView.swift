@@ -12,6 +12,9 @@ struct BeauSessionView: View {
       if !session.groups.isEmpty {
         Text("\(self.session.selectedIds.count)/\(self.session.itemCount) selected")
           .font(.footnote)
+          .padding(.leading, 14)
+          .padding(.top, 8)
+          .padding(.bottom, 2)
         List(session.groups, id: \.id) { group in
           BeauOptimizableGroupView(
             group: group,
