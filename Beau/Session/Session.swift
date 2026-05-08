@@ -19,18 +19,6 @@ class Session: ObservableObject {
   @Published var itemProgressMessage: String = ""
   @Published var selectedTargetPreset: BeauTargetPreset = .defaultValue
   @Published var isRunning: Bool = false
-  @Environment(\.colorScheme) var colorScheme
-
-  var textColor: Color {
-    if isRunning || isDragging {
-      return colorScheme == .dark ? .white : .gray
-    }
-    return colorScheme == .dark ? .white : canRun ? .white : .gray
-  }
-
-  var brandColor: Color {
-    return colorScheme == .dark ? Color.brandDark : Color.brandLight
-  }
 
   var itemCount: Int {
     return groups.reduce(0) { $0 + $1.items.count }

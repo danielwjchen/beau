@@ -4,6 +4,7 @@ struct RunButton: View {
 
   @ObservedObject var session: Session
   @State private var isHovered = false
+  @Environment(\.beauTheme) var beauTheme: BeauTheme
 
   var body: some View {
     Button {
@@ -16,18 +17,18 @@ struct RunButton: View {
             .scaleEffect(0.6)
             .frame(width: 14, height: 14)
           Text("Processing…")
-            .foregroundColor(session.textColor)
+            .foregroundColor(beauTheme.textColor)
         } else if session.isDone {
           Image(systemName: "checkmark")
             .font(.system(size: 12, weight: .bold))
           Text("Done!")
-            .foregroundColor(session.textColor)
+            .foregroundColor(beauTheme.textColor)
         } else {
           Image(systemName: "bolt.fill")
             .font(.system(size: 11, weight: .bold))
-            .foregroundColor(session.textColor)
+            .foregroundColor(beauTheme.textColor)
           Text("Optimize")
-            .foregroundColor(session.textColor)
+            .foregroundColor(beauTheme.textColor)
         }
       }
       .font(.system(size: 13, weight: .semibold))

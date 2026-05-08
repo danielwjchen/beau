@@ -30,39 +30,49 @@ struct ContentView: View {
   @StateObject private var session = Session(
     from: BeauTargetPreset.defaultValue
   )
+  @Environment(\.colorScheme) var colorScheme
 
   var body: some View {
-    SessionView(session)
-      .toolbar {
-        ToolbarItemGroup(placement: .primaryAction) {
-          Picker("Target", selection: $session.selectedTargetPreset) {
-            ForEach(BeauTargetPreset.all) { preset in
-              Text(preset.label).tag(preset)
-            }
+    NavigationSplitView {
+    } detail: {
+      SessionView(session)
+    }
+    .toolbar {
+      ToolbarItemGroup(placement: .primaryAction) {
+        Picker("Target", selection: $session.selectedTargetPreset) {
+          ForEach(BeauTargetPreset.all) { preset in
+            Text(preset.label).tag(preset)
           }
-          .padding(.vertical, 8.0)
-          .padding(.horizontal, 8.0)
-          .onChange(of: session.selectedTargetPreset) {
-            session.setPropertiesFromPreset(session.selectedTargetPreset)
-            session.setSelectedIds(session.selectedTargetPreset)
-            session.groups.forEach { group in
-              group.items.forEach { item in
-                item.updateTargetResolution(
-                  CGSize(
-                    width: session.selectedTargetPreset.width,
-                    height: session.selectedTargetPreset.height
-                  )
-                )
-              }
-            }
-          }
-          Button("Reset", systemImage: "arrow.2.circlepath") {
-            session.reset()
-          }
-          .disabled(session.isRunning || session.accessedURLs.isEmpty)
-          RunButton(session: session)
         }
+        .padding(.vertical, 8.0)
+        .padding(.horizontal, 8.0)
+        .onChange(of: session.selectedTargetPreset) {
+          session.setPropertiesFromPreset(session.selectedTargetPreset)
+          session.setSelectedIds(session.selectedTargetPreset)
+          session.groups.forEach { group in
+            group.items.forEach { item in
+              item.updateTargetResolution(
+                CGSize(
+                  width: session.selectedTargetPreset.width,
+                  height: session.selectedTargetPreset.height
+                )
+              )
+            }
+          }
+        }
+        Button("Reset", systemImage: "arrow.2.circlepath") {
+          session.reset()
+        }
+        .disabled(session.isRunning || session.accessedURLs.isEmpty)
+        RunButton(session: session)
       }
+    }
+    .environment(
+      \.beauTheme,
+      BeauTheme(
+        isActive: session.isRunning || session.isDragging,
+        canRun: session.canRun,
+        colorScheme: colorScheme))
   }
 }
 

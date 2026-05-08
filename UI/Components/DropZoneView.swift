@@ -4,6 +4,7 @@ struct DropZoneView: View {
 
   @ObservedObject var session: Session
   @State private var isImporterPresented: Bool = false
+  @Environment(\.beauTheme) var beauTheme: BeauTheme
 
   var body: some View {
     VStack(spacing: 16) {
@@ -22,10 +23,10 @@ struct DropZoneView: View {
       VStack(spacing: 5) {
         Text("Drop files or folders here")
           .font(.system(size: 15, weight: .medium))
-          .foregroundColor(session.textColor)
+          .foregroundColor(beauTheme.textColor)
         Text("Supports PDF, PNG, JPG, HEIC, MP4, MOV")
           .font(.system(size: 13))
-          .foregroundColor(session.textColor.opacity(0.75))
+          .foregroundColor(beauTheme.textColor.opacity(0.75))
       }
 
       Button {
@@ -34,14 +35,14 @@ struct DropZoneView: View {
       } label: {
         Text("or click to select files or folders")
           .font(.system(size: 12))
-          .foregroundColor(session.textColor)
+          .foregroundColor(beauTheme.textColor)
           .padding(.horizontal, 14)
           .padding(.vertical, 5)
           .background(Color.white.opacity(0.05))
           .clipShape(RoundedRectangle(cornerRadius: 6))
           .overlay(
             RoundedRectangle(cornerRadius: 6)
-              .stroke(session.textColor.opacity(0.75), lineWidth: 1)
+              .stroke(beauTheme.textColor.opacity(0.75), lineWidth: 1)
           )
       }
       .pointingHandCursor()
@@ -63,7 +64,7 @@ struct DropZoneView: View {
     .background(
       RoundedRectangle(cornerRadius: 12)
         .stroke(
-          session.textColor,
+          beauTheme.textColor,
           style: StrokeStyle(lineWidth: 2, dash: [6])
         )
         .background(
