@@ -9,7 +9,24 @@ struct SessionView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      if session.isLoading {
+      if !session.groups.isEmpty && !session.isLoading {
+        Text("\(self.session.selectedIds.count)/\(self.session.itemCount) selected")
+          .font(.footnote)
+          .padding(.leading, 14)
+          .padding(.top, 8)
+          .padding(.bottom, 2)
+        List(session.groups, id: \.id) { group in
+          OptimizableGroupView(
+            group: group,
+            selectedIds: $session.selectedIds
+          )
+          .listRowSeparator(.hidden)
+        }
+      }
+      if session.groups.isEmpty && !session.isLoading {
+        DropZoneView(session: session)
+      }
+      if session.isLoading || session.isOptimizing {
         LoadingView(session.itemProgressMessage)
           .font(.caption)
           .padding(.top, 4)
@@ -21,23 +38,6 @@ struct SessionView: View {
           .padding(.leading, 8)
           .padding(.trailing, 8)
           .padding(.bottom, 8)
-      } else {
-        if !session.groups.isEmpty {
-          Text("\(self.session.selectedIds.count)/\(self.session.itemCount) selected")
-            .font(.footnote)
-            .padding(.leading, 14)
-            .padding(.top, 8)
-            .padding(.bottom, 2)
-          List(session.groups, id: \.id) { group in
-            OptimizableGroupView(
-              group: group,
-              selectedIds: $session.selectedIds
-            )
-            .listRowSeparator(.hidden)
-          }
-        } else {
-          DropZoneView(session: session)
-        }
       }
     }
   }
@@ -53,4 +53,8 @@ struct SessionView: View {
 
 #Preview("With Items") {
   SessionView(BeauPreviewMocks.getSessionWithItems())
+}
+
+#Preview("Is Optimizing") {
+  SessionView(BeauPreviewMocks.getSessionIsOptimizing())
 }

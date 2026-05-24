@@ -155,12 +155,16 @@ class Session {
     timeBegin = Date()
     isReady = false
     isOptimizing = true
+    var itemCount = 0
     Task {
       for g in groups.indices {
         for i in groups[g].items.indices {
           if !selectedIds.contains(groups[g].items[i].id) {
             continue
           }
+          itemCount += 1
+          self.itemProgressMessage = "Optimizing \(groups[g].items[i].sourceURL.lastPathComponent)"
+          self.itemProgressPercentage = Float(itemCount) / Float(selectedIds.count)
           await processOptimizable(groups[g].items[i], tempFileNamePattern)
         }
       }

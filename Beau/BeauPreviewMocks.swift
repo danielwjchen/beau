@@ -81,6 +81,17 @@ struct BeauPreviewMocks {
     return session
   }
 
+  public static func getSessionIsOptimizing() -> Session {
+    let session = getSessionEmpty()
+    session.groups = [
+      getGroupWithItems()
+    ]
+    session.isOptimizing = true
+    session.itemProgressPercentage = 0.5
+    session.itemProgressMessage = "Optimizing files"
+    return session
+  }
+
   public static func getSessionWithSelectedItems() -> Session {
     let session = getSessionWithItems()
     session.isReady = true
