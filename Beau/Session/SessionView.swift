@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SessionView: View {
-  @ObservedObject var session: Session
+  @Bindable var session: Session
 
   init(_ session: Session) {
     self.session = session
@@ -9,7 +9,7 @@ struct SessionView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      if session.isRunning {
+      if session.isLoading {
         LoadingView(session.itemProgressMessage)
           .font(.caption)
           .padding(.top, 4)
@@ -45,6 +45,10 @@ struct SessionView: View {
 
 #Preview("Empty Session") {
   SessionView(BeauPreviewMocks.getSessionEmpty())
+}
+
+#Preview("Is Loading") {
+  SessionView(BeauPreviewMocks.getSessionIsLoading())
 }
 
 #Preview("With Items") {

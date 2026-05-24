@@ -2,16 +2,16 @@ import SwiftUI
 
 struct RunButton: View {
 
-  @ObservedObject var session: Session
+  @Bindable var session: Session
   @State private var isHovered = false
   @Environment(\.beauTheme) var beauTheme: BeauTheme
 
   var body: some View {
     Button {
-      session.run()
+      session.optimize()
     } label: {
       HStack(spacing: 7) {
-        if session.isRunning {
+        if session.isLoading || session.isOptimizing {
           ProgressView()
             .progressViewStyle(.circular)
             .scaleEffect(0.6)

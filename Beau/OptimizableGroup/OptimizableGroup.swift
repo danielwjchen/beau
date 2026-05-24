@@ -1,13 +1,14 @@
 import SwiftUI
 
-class OptimizableGroup: ObservableObject, Identifiable {
+@Observable
+class OptimizableGroup: Identifiable {
 
   let url: URL
 
   let id = UUID()
-  @Published var items: [any Optimizable] = []
+  var items: [BaseOptimizable] = []
 
-  init(url: URL, items: [any Optimizable] = []) {
+  init(url: URL, items: [BaseOptimizable] = []) {
     self.url = url
     self.items = items
   }

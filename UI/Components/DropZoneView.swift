@@ -2,7 +2,7 @@ import SwiftUI
 
 struct DropZoneView: View {
 
-  @ObservedObject var session: Session
+  @Bindable var session: Session
   @State private var isImporterPresented: Bool = false
   @Environment(\.beauTheme) var beauTheme: BeauTheme
 

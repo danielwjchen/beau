@@ -73,6 +73,14 @@ struct BeauPreviewMocks {
     return session
   }
 
+  public static func getSessionIsLoading() -> Session {
+    let session = getSessionEmpty()
+    session.isLoading = true
+    session.itemProgressPercentage = 0.5
+    session.itemProgressMessage = "Loading files"
+    return session
+  }
+
   public static func getSessionWithSelectedItems() -> Session {
     let session = getSessionWithItems()
     session.isReady = true

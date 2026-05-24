@@ -4,30 +4,13 @@ import ImageIO
 import UniformTypeIdentifiers
 import os
 
-class ImageOptimizable: Optimizable {
-
-  let id = UUID()
-  var sourceURL: URL
-  var targetURL: URL
-
-  @Published var timeBegin: Date?
-  @Published var timeEnd: Date?
-  @Published var sourceSize: Int64?
-  @Published var targetSize: Int64?
-  @Published var sourceResolution: CGSize?
-  @Published var targetResolution: CGSize?
-  @Published var sourceEncoding: String = ""
-  @Published var targetEncoding: String = ""
-  @Published var error: String = ""
-  @Published var completionPercentage: Float? = nil
-  @Published var thumbnail: CGImage?
-  @Published var processedOn: Date?
+final class ImageOptimizable: BaseOptimizable, Optimizable {
 
   required init(
     sourceURL: URL
   ) {
-    self.sourceURL = sourceURL
-    self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("jpg")
+    let targetURL = sourceURL.deletingPathExtension().appendingPathExtension("jpg")
+    super.init(sourceURL: sourceURL, targetURL: targetURL)
     do {
       let imageData = try Data(contentsOf: sourceURL)
 

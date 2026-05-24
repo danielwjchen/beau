@@ -1,6 +1,7 @@
 import SwiftUI
 
-class Session: ObservableObject {
+@Observable
+class Session {
   var resolution: String
   var encoding: String
   var renamePattern: String
@@ -8,17 +9,18 @@ class Session: ObservableObject {
   var preservesMeta: Bool
   var accessedURLs: [URL] = []
   var preservesFolders: Bool
-  @Published var selectedIds: Set<UUID> = []
-  @Published var groups: [OptimizableGroup] = []
-  @Published var timeBegin: Date?
-  @Published var timeEnd: Date?
-  @Published var isReady: Bool = false
-  @Published var isAccessing: Bool = false
-  @Published var isDragging = false
-  @Published var itemProgressPercentage: Float? = nil
-  @Published var itemProgressMessage: String = ""
-  @Published var selectedTargetPreset: BeauTargetPreset = .defaultValue
-  @Published var isRunning: Bool = false
+  var selectedIds: Set<UUID> = []
+  var groups: [OptimizableGroup] = []
+  var timeBegin: Date?
+  var timeEnd: Date?
+  var isReady: Bool = false
+  var isAccessing: Bool = false
+  var isDragging = false
+  var itemProgressPercentage: Float? = nil
+  var itemProgressMessage: String = ""
+  var selectedTargetPreset: BeauTargetPreset = .defaultValue
+  var isLoading: Bool = false
+  var isOptimizing: Bool = false
 
   var itemCount: Int {
     return groups.reduce(0) { $0 + $1.items.count }
@@ -62,7 +64,7 @@ class Session: ObservableObject {
   }
 
   var canRun: Bool {
-    return isReady && !selectedIds.isEmpty && !isRunning
+    return isReady && !selectedIds.isEmpty && !isOptimizing && !isLoading
   }
 
   public func setPropertiesFromPreset(_ preset: BeauTargetPreset) {
@@ -109,7 +111,7 @@ class Session: ObservableObject {
     itemProgressPercentage = nil
     itemProgressMessage = ""
     groups = []
-    isRunning = true
+    isLoading = true
     selectedIds.removeAll()
     cleanUpAccess()
     guard !urls.isEmpty else { return }
@@ -134,7 +136,7 @@ class Session: ObservableObject {
     let targetResolution = CGSize(width: 1920, height: 1080)
     let targetEncoding = ""
     Task {
-      let items = await createOptimizable(
+      let items = await createOptimizables(
         fileURLs, targetResolution, targetEncoding
       ) { progressPercentage, message in
         self.itemProgressPercentage = progressPercentage
@@ -145,14 +147,14 @@ class Session: ObservableObject {
       }
       setSelectedIds(selectedTargetPreset)
       isReady = items.count > 0
-      isRunning = false
+      isLoading = false
     }
   }
 
-  public func run() {
+  public func optimize() {
     timeBegin = Date()
     isReady = false
-    isRunning = true
+    isOptimizing = true
     Task {
       for g in groups.indices {
         for i in groups[g].items.indices {
@@ -164,7 +166,7 @@ class Session: ObservableObject {
       }
       timeEnd = Date()
       cleanUpAccess()
-      isRunning = false
+      isOptimizing = false
     }
   }
 
@@ -176,7 +178,8 @@ class Session: ObservableObject {
     isReady = false
     itemProgressPercentage = nil
     itemProgressMessage = ""
-    isRunning = false
+    isLoading = false
+    isOptimizing = false
     cleanUpAccess()
   }
 }

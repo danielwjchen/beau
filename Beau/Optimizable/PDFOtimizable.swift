@@ -4,30 +4,12 @@ import Quartz
 
 let QUARTZ_FILETER_PATH = "/System/Library/Filters/Reduce File Size.qfilter"
 
-class PDFOptimizable: Optimizable {
-
-  let id = UUID()
-  var sourceURL: URL
-  var targetURL: URL
-
-  @Published var timeBegin: Date?
-  @Published var timeEnd: Date?
-  @Published var sourceSize: Int64?
-  @Published var targetSize: Int64?
-  @Published var sourceResolution: CGSize?
-  @Published var targetResolution: CGSize?
-  @Published var sourceEncoding: String = ""
-  @Published var targetEncoding: String = ""
-  @Published var error: String = ""
-  @Published var completionPercentage: Float? = nil
-  @Published var thumbnail: CGImage?
-  @Published var processedOn: Date?
+final class PDFOptimizable: BaseOptimizable, Optimizable {
 
   required init(
     sourceURL: URL
   ) {
-    self.sourceURL = sourceURL
-    self.targetURL = sourceURL
+    super.init(sourceURL: sourceURL, targetURL: sourceURL)
     let pdfDocument = PDFDocument(url: sourceURL)
     let attributes = pdfDocument?.documentAttributes ?? [:]
     if let existing = attributes[PDFDocumentAttribute.keywordsAttribute] as? [String] {

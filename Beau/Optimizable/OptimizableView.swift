@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct OptimizableView: View {
-  let item: any Optimizable
+  let item: BaseOptimizable
   let relativeURL: URL
   @Binding var selectedIds: Set<UUID>
 
-  init(_ item: any Optimizable, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
+  init(_ item: BaseOptimizable, _ sourceURL: URL, _ selectedIds: Binding<Set<UUID>>) {
     let urlString = item.sourceURL.path.replacingOccurrences(
       of: sourceURL.path,
       with: ""

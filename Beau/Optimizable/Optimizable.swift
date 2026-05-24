@@ -3,7 +3,7 @@ import Foundation
 
 let BEAU_SIGNATURE = "Optimized with Beau"
 
-protocol Optimizable: ObservableObject, Identifiable {
+protocol Optimizable: Identifiable {
   var id: UUID { get }
   var timeBegin: Date? { get set }
   var timeEnd: Date? { get set }
@@ -17,9 +17,9 @@ protocol Optimizable: ObservableObject, Identifiable {
   var targetSize: Int64? { get set }
   var thumbnail: CGImage? { get set }
   var processedOn: Date? { get set }
-
   var error: String { get set }
   var completionPercentage: Float? { get set }
+
   init(sourceURL: URL)
   func optimizeWithProgress(_ tempFileURL: URL, _ progressHandler: @escaping (Float) -> Void)
     async throws
@@ -27,7 +27,31 @@ protocol Optimizable: ObservableObject, Identifiable {
   static func getDimensions(from url: URL) async throws -> CGSize
 }
 
-extension Optimizable {
+@Observable
+class BaseOptimizable {
+
+  let id = UUID()
+  var sourceURL: URL
+  var targetURL: URL
+
+  var timeBegin: Date?
+  var timeEnd: Date?
+  var sourceSize: Int64?
+  var targetSize: Int64?
+  var sourceResolution: CGSize?
+  var targetResolution: CGSize?
+  var sourceEncoding: String = ""
+  var targetEncoding: String = ""
+  var error: String = ""
+  var completionPercentage: Float? = nil
+  var thumbnail: CGImage?
+  var processedOn: Date?
+
+  init(sourceURL: URL, targetURL: URL) {
+    self.sourceURL = sourceURL
+    self.targetURL = targetURL
+  }
+
   func updateTargetResolution(_ targetResolution: CGSize) {
     let maxTargetDimension = max(targetResolution.width, targetResolution.height)
     let maxSourceDimension = max(sourceResolution?.width ?? 0, sourceResolution?.height ?? 0)

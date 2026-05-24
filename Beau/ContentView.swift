@@ -27,7 +27,7 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
 
-  @StateObject private var session = Session(
+  @State private var session = Session(
     from: BeauTargetPreset.defaultValue
   )
   @Environment(\.colorScheme) var colorScheme
@@ -63,14 +63,14 @@ struct ContentView: View {
         Button("Reset", systemImage: "arrow.2.circlepath") {
           session.reset()
         }
-        .disabled(session.isRunning || session.accessedURLs.isEmpty)
+        .disabled(session.isLoading || session.isOptimizing || session.accessedURLs.isEmpty)
         RunButton(session: session)
       }
     }
     .environment(
       \.beauTheme,
       BeauTheme(
-        isActive: session.isRunning || session.isDragging,
+        isActive: session.isLoading || session.isOptimizing || session.isDragging,
         canRun: session.canRun,
         colorScheme: colorScheme))
   }

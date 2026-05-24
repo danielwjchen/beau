@@ -63,13 +63,13 @@ func getFileSize(at url: URL) throws -> Int64? {
   return attributes[.size] as? Int64
 }
 
-func createOptimizable(
+func createOptimizables(
   _ fileURLs: [URL], _ targetResolution: CGSize, _ targetEncoding: String,
   progressStep: Float = 0.9,
   progressHandler: @escaping (Float, String) -> Void
-) async -> [any Optimizable] {
+) async -> [BaseOptimizable] {
   let thumbnailSize: CGSize = CGSize(width: 100, height: 100)
-  var result: [any Optimizable] = []
+  var result: [BaseOptimizable] = []
   progressHandler(0, "Loading files")
   for (index, fileURL) in fileURLs.enumerated() {
     let itemNumber = index + 1
@@ -77,7 +77,7 @@ func createOptimizable(
     let progressMessage = "\(itemNumber)/\(fileURLs.count)"
     progressHandler(progressPercentage, "\(progressMessage) \(fileURL.lastPathComponent) is found")
     if let BeauMediaOptimizableType = getBeauMediaOptimizableType(for: fileURL) {
-      let item = BeauMediaOptimizableType.init(
+      var item = BeauMediaOptimizableType.init(
         sourceURL: fileURL
       )
       do {
@@ -100,7 +100,9 @@ func createOptimizable(
       } catch {
         item.error = error.localizedDescription
       }
-      result.append(item)
+      if let baseOptimizable = item as? BaseOptimizable {
+        result.append(baseOptimizable)
+      }
     } else {
       progressHandler(
         progressPercentage,
@@ -188,7 +190,7 @@ func moveFileToTrashIfExists(_ url: URL) throws -> Bool {
 }
 
 func processOptimizable(
-  _ item: any Optimizable, _ tempFileNamePattern: String
+  _ item: BaseOptimizable, _ tempFileNamePattern: String
 ) async {
   item.completionPercentage = 0
   do {
@@ -196,8 +198,10 @@ func processOptimizable(
     do {
 
       item.timeBegin = Date()
-      try await item.optimizeWithProgress(tempFileURL) { progress in
-        item.completionPercentage = progress
+      if let optimizableItem = item as? any Optimizable {
+        try await optimizableItem.optimizeWithProgress(tempFileURL) { progress in
+          item.completionPercentage = progress
+        }
       }
       item.targetSize = try getFileSize(at: tempFileURL)
       let isAbleToMoveSourceFileToTrash = try moveFileToTrashIfExists(
@@ -237,6 +241,6 @@ func getBeauMediaOptimizableType(for url: URL) -> (any Optimizable.Type)? {
   return nil
 }
 
-func groupOptimizablesByFolder(_ items: [any Optimizable]) -> [URL: [any Optimizable]] {
+func groupOptimizablesByFolder(_ items: [BaseOptimizable]) -> [URL: [BaseOptimizable]] {
   Dictionary(grouping: items, by: { $0.sourceURL.deletingLastPathComponent() })
 }

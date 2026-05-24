@@ -1,30 +1,13 @@
 import AVFoundation
 import Foundation
 
-class VideoOptimizable: Optimizable {
-
-  let id = UUID()
-  var sourceURL: URL
-  var targetURL: URL
-
-  @Published var timeBegin: Date?
-  @Published var timeEnd: Date?
-  @Published var sourceSize: Int64?
-  @Published var targetSize: Int64?
-  @Published var sourceResolution: CGSize?
-  @Published var targetResolution: CGSize?
-  @Published var sourceEncoding: String = ""
-  @Published var targetEncoding: String = ""
-  @Published var error: String = ""
-  @Published var completionPercentage: Float? = nil
-  @Published var thumbnail: CGImage?
-  @Published var processedOn: Date?
+class VideoOptimizable: BaseOptimizable, Optimizable {
 
   required init(
     sourceURL: URL
   ) {
-    self.sourceURL = sourceURL
-    self.targetURL = sourceURL.deletingPathExtension().appendingPathExtension("mp4")
+    let targetURL = sourceURL.deletingPathExtension().appendingPathExtension("mp4")
+    super.init(sourceURL: sourceURL, targetURL: targetURL)
     let asset = AVAsset(url: sourceURL)
 
     Task {
